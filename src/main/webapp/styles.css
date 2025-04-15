@@ -1,0 +1,139 @@
+/* General Styles */
+body {
+    background-color: #f8f9fa;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.section-active {
+    display: block;
+}
+
+/* Card Styles */
+.card {
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    margin-bottom: 20px;
+}
+
+.card-title {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+/* Stats Boxes */
+.stat-box {
+    padding: 15px;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
+}
+
+.stat-box:hover {
+    background-color: #e9ecef;
+    transform: translateY(-5px);
+}
+
+.stat-box i {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.stat-box h4 {
+    font-weight: bold;
+    margin: 5px 0;
+}
+
+/* Book Cover */
+.book-cover {
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-height: 200px;
+    object-fit: cover;
+}
+
+/* Book Details */
+.book-details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.detail-item {
+    margin-bottom: 8px;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: #6c757d;
+    margin-right: 5px;
+}
+
+/* Form Styles */
+.form-label {
+    font-weight: 500;
+    color: #495057;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Table Styles */
+.table {
+    vertical-align: middle;
+}
+
+.table th {
+    font-weight: 600;
+    color: #495057;
+}
+
+/* Quick Results */
+.quick-results-placeholder {
+    padding: 20px;
+}
+
+.quick-results-placeholder i {
+    color: #dee2e6;
+    margin-bottom: 10px;
+}
+
+/* Recent Activity */
+#recent-activity li {
+    transition: background-color 0.2s ease;
+}
+
+#recent-activity li:hover {
+    background-color: #f8f9fa;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .book-details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-box {
+        margin-bottom: 15px;
+    }
+}
+
+/* Animation for notifications */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.toast.show {
+    animation: fadeIn 0.3s ease forwards;
+}
