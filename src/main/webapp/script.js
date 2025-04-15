@@ -1,584 +1,668 @@
-// DOM Elements
+// Elementos del DOM
 document.addEventListener("DOMContentLoaded", () => {
-    // Navigation
-    const navLinks = document.querySelectorAll(".navbar-nav .nav-link")
-    const sections = document.querySelectorAll(".container > section")
-    const btnToAdd = document.getElementById("btn-to-add")
-    const btnToLoans = document.getElementById("btn-to-loans")
+    // Navegación
+    const enlacesNav = document.querySelectorAll(".navbar-nav .nav-link")
+    const secciones = document.querySelectorAll(".container > section")
+    const btnIrAgregar = document.getElementById("btn-ir-agregar")
+    const btnIrPrestamos = document.getElementById("btn-ir-prestamos")
 
-    // Book Form
-    const bookForm = document.getElementById("book-form")
-    const bookTypeSelect = document.getElementById("book-type")
-    const dynamicFields = document.getElementById("dynamic-fields")
-    const btnResetForm = document.getElementById("btn-reset-form")
+    // Formulario de Libro
+    const formularioLibro = document.getElementById("formulario-libro")
+    const selectTipoLibro = document.getElementById("libro-tipo")
+    const camposDinamicos = document.getElementById("campos-dinamicos")
+    const btnLimpiarFormulario = document.getElementById("btn-limpiar-formulario")
 
-    // Book List
-    const searchCatalog = document.getElementById("search-catalog")
-    const filterType = document.getElementById("filter-type")
-    const filterAvailability = document.getElementById("filter-availability")
-    const booksTableBody = document.getElementById("books-table-body")
+    // Lista de Libros
+    const buscarCatalogo = document.getElementById("buscar-catalogo")
+    const filtroTipo = document.getElementById("filtro-tipo")
+    const filtroDisponibilidad = document.getElementById("filtro-disponibilidad")
+    const cuerpoTablaLibros = document.getElementById("cuerpo-tabla-libros")
 
-    // Quick Search
-    const quickSearch = document.getElementById("quick-search")
-    const btnQuickSearch = document.getElementById("btn-quick-search")
-    const quickResults = document.getElementById("quick-results")
+    // Búsqueda Rápida
+    const busquedaRapida = document.getElementById("busqueda-rapida")
+    const btnBusquedaRapida = document.getElementById("btn-busqueda-rapida")
+    const resultadosRapidos = document.getElementById("resultados-rapidos")
 
-    // Modals
-    const bookDetailsModal = new bootstrap.Modal(document.getElementById("bookDetailsModal"))
-    const editBookModal = new bootstrap.Modal(document.getElementById("editBookModal"))
-    const returnBookModal = new bootstrap.Modal(document.getElementById("returnBookModal"))
-    const confirmationModal = new bootstrap.Modal(document.getElementById("confirmationModal"))
+    // Modales
+    const modalDetallesLibro = new bootstrap.Modal(document.getElementById("modalDetallesLibro"))
+    const modalEditarLibro = new bootstrap.Modal(document.getElementById("modalEditarLibro"))
+    const modalDevolucionLibro = new bootstrap.Modal(document.getElementById("modalDevolucionLibro"))
+    const modalConfirmacion = new bootstrap.Modal(document.getElementById("modalConfirmacion"))
 
     // Toast
-    const toast = new bootstrap.Toast(document.getElementById("liveToast"))
+    const notificacion = new bootstrap.Toast(document.getElementById("notificacionToast"))
 
-    // Data Storage (simulating database)
-    let books = []
-    let loans = []
-    let patrons = []
-    const activities = []
+    // Almacenamiento de Datos (simulando base de datos)
+    let libros = []
+    let prestamos = []
+    let usuarios = []
+    const actividades = []
 
-    // Initialize with sample data
-    initializeSampleData()
-    updateStats()
-    updateRecentActivity()
+    // Inicializar con datos de ejemplo
+    inicializarDatosEjemplo()
+    actualizarEstadisticas()
+    actualizarActividadReciente()
 
-    // Navigation Event Listeners
-    navLinks.forEach((link) => {
-        link.addEventListener("click", function (e) {
+    // Configuración común para DataTables
+    const configDataTables = {
+        dom: 'Bfrtip',
+        buttons: [
+            {
+                extend: 'excel',
+                text: '<i class="fas fa-file-excel"></i> Excel',
+                className: 'btn btn-success btn-sm',
+                titleAttr: 'Exportar a Excel',
+                exportOptions: {
+                    columns: ':visible'
+                }
+            },
+            {
+                extend: 'pdf',
+                text: '<i class="fas fa-file-pdf"></i> PDF',
+                className: 'btn btn-danger btn-sm',
+                titleAttr: 'Exportar a PDF',
+                exportOptions: {
+                    columns: ':visible'
+                }
+            },
+            {
+                extend: 'print',
+                text: '<i class="fas fa-print"></i> Imprimir',
+                className: 'btn btn-info btn-sm',
+                titleAttr: 'Imprimir',
+                exportOptions: {
+                    columns: ':visible'
+                }
+            },
+            {
+                extend: 'colvis',
+                text: '<i class="fas fa-columns"></i> Columnas',
+                className: 'btn btn-secondary btn-sm',
+                titleAttr: 'Mostrar/Ocultar columnas'
+            }
+        ],
+        language: {
+            "sProcessing":     "Procesando...",
+            "sLengthMenu":     "Mostrar _MENU_ registros",
+            "sZeroRecords":    "No se encontraron resultados",
+            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+            "sInfoPostFix":    "",
+            "sSearch":         "Buscar:",
+            "sUrl":            "",
+            "sInfoThousands":  ",",
+            "sLoadingRecords": "Cargando...",
+            "oPaginate": {
+                "sFirst":    "Primero",
+                "sLast":     "Último",
+                "sNext":     "Siguiente",
+                "sPrevious": "Anterior"
+            },
+            "oAria": {
+                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+            },
+            "buttons": {
+                "copy": "Copiar",
+                "colvis": "Visibilidad",
+                "collection": "Colección",
+                "colvisRestore": "Restaurar visibilidad",
+                "copyKeys": "Presione ctrl o u2318 + C para copiar los datos de la tabla al portapapeles del sistema. <br><br>Para cancelar, haga clic en este mensaje o presione escape.",
+                "copySuccess": {
+                    "1": "Copiada 1 fila al portapapeles",
+                    "_": "Copiadas %d filas al portapapeles"
+                },
+                "copyTitle": "Copiar al portapapeles",
+                "csv": "CSV",
+                "excel": "Excel",
+                "pageLength": {
+                    "-1": "Mostrar todas las filas",
+                    "_": "Mostrar %d filas"
+                },
+                "pdf": "PDF",
+                "print": "Imprimir"
+            }
+        }
+    };
+
+    // Event Listeners de Navegación
+    enlacesNav.forEach((enlace) => {
+        enlace.addEventListener("click", function (e) {
             e.preventDefault()
 
-            // Update active nav link
-            navLinks.forEach((l) => l.classList.remove("active"))
+            // Actualizar enlace activo
+            enlacesNav.forEach((l) => l.classList.remove("active"))
             this.classList.add("active")
 
-            // Show corresponding section
-            const targetId = this.id.replace("nav-", "") + "-section"
-            sections.forEach((section) => {
-                section.classList.add("d-none")
-                section.classList.remove("section-active")
+            // Mostrar sección correspondiente
+            const idObjetivo = this.id.replace("nav-", "") + "-section"
+            secciones.forEach((seccion) => {
+                seccion.classList.add("d-none")
+                seccion.classList.remove("section-active")
             })
-            document.getElementById(targetId).classList.remove("d-none")
-            document.getElementById(targetId).classList.add("section-active")
+            document.getElementById(idObjetivo).classList.remove("d-none")
+            document.getElementById(idObjetivo).classList.add("section-active")
 
-            // Update content based on section
-            if (targetId === "list-section") {
-                renderBooksList()
-            } else if (targetId === "loans-section") {
-                renderActiveLoans()
+            // Actualizar contenido según la sección
+            if (idObjetivo === "lista-section") {
+                renderizarListaLibros()
+            } else if (idObjetivo === "prestamos-section") {
+                renderizarPrestamosActivos()
             }
         })
     })
 
-    // Home page buttons
-    btnToAdd.addEventListener("click", () => {
-        document.getElementById("nav-add").click()
+    // Botones de página de inicio
+    btnIrAgregar.addEventListener("click", () => {
+        document.getElementById("nav-agregar").click()
     })
 
-    btnToLoans.addEventListener("click", () => {
-        document.getElementById("nav-loans").click()
+    btnIrPrestamos.addEventListener("click", () => {
+        document.getElementById("nav-prestamos").click()
     })
 
-    // Book Type Change - Dynamic Fields
-    bookTypeSelect.addEventListener("change", function () {
-        generateDynamicFields(this.value, dynamicFields)
+    // Cambio de Tipo de Libro - Campos Dinámicos
+    selectTipoLibro.addEventListener("change", function () {
+        generarCamposDinamicos(this.value, camposDinamicos)
     })
 
-    // Edit Book Type Change
-    document.getElementById("edit-book-type").addEventListener("change", function () {
-        generateDynamicFields(this.value, document.getElementById("edit-dynamic-fields"))
+    // Cambio de Tipo de Libro en Edición
+    document.getElementById("editar-tipo-libro").addEventListener("change", function () {
+        generarCamposDinamicos(this.value, document.getElementById("editar-campos-dinamicos"))
     })
 
-    // Reset Form Button
-    btnResetForm.addEventListener("click", () => {
-        bookForm.reset()
-        dynamicFields.innerHTML = ""
+    // Botón Limpiar Formulario
+    btnLimpiarFormulario.addEventListener("click", () => {
+        formularioLibro.reset()
+        camposDinamicos.innerHTML = ""
     })
 
-    // Book Form Submit
-    bookForm.addEventListener("submit", function (e) {
+    // Envío de Formulario de Libro
+    formularioLibro.addEventListener("submit", function (e) {
         e.preventDefault()
 
-        // Validate form
+        // Validar formulario
         if (!this.checkValidity()) {
             e.stopPropagation()
             this.classList.add("was-validated")
             return
         }
 
-        // Get form data
-        const newBook = {
-            id: generateId(),
-            isbn: document.getElementById("book-isbn").value,
-            title: document.getElementById("book-title").value,
-            author: document.getElementById("book-author").value,
-            year: document.getElementById("book-year").value,
-            publisher: document.getElementById("book-publisher").value,
-            type: document.getElementById("book-type").value,
-            description: document.getElementById("book-description").value,
-            copies: Number.parseInt(document.getElementById("book-copies").value),
-            availableCopies: Number.parseInt(document.getElementById("book-copies").value),
-            location: document.getElementById("book-location").value,
-            cover:
-                document.getElementById("book-cover").files.length > 0
-                    ? URL.createObjectURL(document.getElementById("book-cover").files[0])
+        // Obtener datos del formulario
+        const nuevoLibro = {
+            id: generarId(),
+            isbn: document.getElementById("libro-isbn").value,
+            titulo: document.getElementById("libro-titulo").value,
+            autor: document.getElementById("libro-autor").value,
+            anio: document.getElementById("libro-anio").value,
+            editorial: document.getElementById("libro-editorial").value,
+            tipo: document.getElementById("libro-tipo").value,
+            descripcion: document.getElementById("libro-descripcion").value,
+            copias: Number.parseInt(document.getElementById("libro-copias").value),
+            copiasDisponibles: Number.parseInt(document.getElementById("libro-copias").value),
+            ubicacion: document.getElementById("libro-ubicacion").value,
+            portada:
+                document.getElementById("libro-portada").files.length > 0
+                    ? URL.createObjectURL(document.getElementById("libro-portada").files[0])
                     : "/placeholder.svg?height=200&width=150",
-            specificDetails: getSpecificDetails(document.getElementById("book-type").value),
+            detallesEspecificos: obtenerDetallesEspecificos(document.getElementById("libro-tipo").value),
         }
 
-        // Add book to collection
-        books.push(newBook)
+        // Agregar libro a la colección
+        libros.push(nuevoLibro)
 
-        // Add to recent activity
-        addActivity(`Libro agregado: "${newBook.title}" por ${newBook.author}`)
+        // Agregar a actividad reciente
+        agregarActividad(`Libro agregado: "${nuevoLibro.titulo}" por ${nuevoLibro.autor}`)
 
-        // Show success message
-        showToast("Éxito", "Libro agregado correctamente", "success")
+        // Mostrar mensaje de éxito
+        mostrarNotificacion("Éxito", "Libro agregado correctamente", "success")
 
-        // Reset form
-        bookForm.reset()
-        dynamicFields.innerHTML = ""
-        bookForm.classList.remove("was-validated")
+        // Resetear formulario
+        formularioLibro.reset()
+        camposDinamicos.innerHTML = ""
+        formularioLibro.classList.remove("was-validated")
 
-        // Update stats
-        updateStats()
+        // Actualizar estadísticas
+        actualizarEstadisticas()
     })
 
-    // Quick Search
-    btnQuickSearch.addEventListener("click", performQuickSearch)
-    quickSearch.addEventListener("keyup", (e) => {
+    // Búsqueda Rápida
+    btnBusquedaRapida.addEventListener("click", realizarBusquedaRapida)
+    busquedaRapida.addEventListener("keyup", (e) => {
         if (e.key === "Enter") {
-            performQuickSearch()
+            realizarBusquedaRapida()
         }
     })
 
-    // Catalog Search and Filters
-    document.getElementById("btn-search-catalog").addEventListener("click", () => {
-        renderBooksList()
+    // Búsqueda en Catálogo y Filtros
+    document.getElementById("btn-buscar-catalogo").addEventListener("click", () => {
+        renderizarListaLibros()
     })
 
-    searchCatalog.addEventListener("keyup", (e) => {
+    buscarCatalogo.addEventListener("keyup", (e) => {
         if (e.key === "Enter") {
-            renderBooksList()
+            renderizarListaLibros()
         }
     })
 
-    filterType.addEventListener("change", renderBooksList)
-    filterAvailability.addEventListener("change", renderBooksList)
+    filtroTipo.addEventListener("change", renderizarListaLibros)
+    filtroDisponibilidad.addEventListener("change", renderizarListaLibros)
 
-    // Loan Form
-    document.getElementById("loan-form").addEventListener("submit", function (e) {
+    // Formulario de Préstamo
+    document.getElementById("formulario-prestamo").addEventListener("submit", function (e) {
         e.preventDefault()
 
-        // Validate form
+        // Validar formulario
         if (!this.checkValidity()) {
             e.stopPropagation()
             this.classList.add("was-validated")
             return
         }
 
-        // Get form data
-        const newLoan = {
-            id: generateId(),
-            patronId: document.getElementById("patron-id").value,
-            patronName: document.getElementById("patron-name").value,
-            bookId: document.getElementById("book-id-loan").value,
-            bookTitle: document.getElementById("book-title-loan").value,
-            loanDate: document.getElementById("loan-date").value,
-            returnDate: document.getElementById("return-date").value,
-            actualReturnDate: null,
-            status: "active",
+        // Obtener datos del formulario
+        const nuevoPrestamo = {
+            id: generarId(),
+            idUsuario: document.getElementById("id-usuario").value,
+            nombreUsuario: document.getElementById("nombre-usuario").value,
+            idLibro: document.getElementById("id-libro-prestamo").value,
+            tituloLibro: document.getElementById("titulo-libro-prestamo").value,
+            fechaPrestamo: document.getElementById("fecha-prestamo").value,
+            fechaDevolucion: document.getElementById("fecha-devolucion").value,
+            fechaDevolucionReal: null,
+            estado: "activo",
         }
 
-        // Find book and update available copies
-        const book = books.find((b) => b.isbn === newLoan.bookId)
-        if (book && book.availableCopies > 0) {
-            book.availableCopies--
+        // Encontrar libro y actualizar copias disponibles
+        const libro = libros.find((b) => b.isbn === nuevoPrestamo.idLibro)
+        if (libro && libro.copiasDisponibles > 0) {
+            libro.copiasDisponibles--
 
-            // Add loan to collection
-            loans.push(newLoan)
+            // Agregar préstamo a la colección
+            prestamos.push(nuevoPrestamo)
 
-            // Add to recent activity
-            addActivity(`Préstamo registrado: "${book.title}" a ${newLoan.patronName}`)
+            // Agregar a actividad reciente
+            agregarActividad(`Préstamo registrado: "${libro.titulo}" a ${nuevoPrestamo.nombreUsuario}`)
 
-            // Show success message
-            showToast("Éxito", "Préstamo registrado correctamente", "success")
+            // Mostrar mensaje de éxito
+            mostrarNotificacion("Éxito", "Préstamo registrado correctamente", "success")
 
-            // Reset form
+            // Resetear formulario
             this.reset()
-            document.getElementById("patron-name").value = ""
-            document.getElementById("book-title-loan").value = ""
+            document.getElementById("nombre-usuario").value = ""
+            document.getElementById("titulo-libro-prestamo").value = ""
             this.classList.remove("was-validated")
 
-            // Update stats and loans list
-            updateStats()
-            renderActiveLoans()
+            // Actualizar estadísticas y lista de préstamos
+            actualizarEstadisticas()
+            renderizarPrestamosActivos()
         } else {
-            showToast("Error", "No hay copias disponibles de este libro", "danger")
+            mostrarNotificacion("Error", "No hay copias disponibles de este libro", "danger")
         }
     })
 
-    // Search Patron Button
-    document.getElementById("btn-search-patron").addEventListener("click", () => {
-        const patronId = document.getElementById("patron-id").value
-        const patron = patrons.find((p) => p.id === patronId)
+    // Botón Buscar Usuario
+    document.getElementById("btn-buscar-usuario").addEventListener("click", () => {
+        const idUsuario = document.getElementById("id-usuario").value
+        const usuario = usuarios.find((p) => p.id === idUsuario)
 
-        if (patron) {
-            document.getElementById("patron-name").value = patron.name
+        if (usuario) {
+            document.getElementById("nombre-usuario").value = usuario.nombre
         } else {
-            document.getElementById("patron-name").value = ""
-            showToast("Información", "Usuario no encontrado", "warning")
+            document.getElementById("nombre-usuario").value = ""
+            mostrarNotificacion("Información", "Usuario no encontrado", "warning")
         }
     })
 
-    // Search Book Button
-    document.getElementById("btn-search-book").addEventListener("click", () => {
-        const bookId = document.getElementById("book-id-loan").value
-        const book = books.find((b) => b.isbn === bookId)
+    // Botón Buscar Libro
+    document.getElementById("btn-buscar-libro").addEventListener("click", () => {
+        const idLibro = document.getElementById("id-libro-prestamo").value
+        const libro = libros.find((b) => b.isbn === idLibro)
 
-        if (book) {
-            if (book.availableCopies > 0) {
-                document.getElementById("book-title-loan").value = book.title
+        if (libro) {
+            if (libro.copiasDisponibles > 0) {
+                document.getElementById("titulo-libro-prestamo").value = libro.titulo
             } else {
-                document.getElementById("book-title-loan").value = ""
-                showToast("Información", "No hay copias disponibles de este libro", "warning")
+                document.getElementById("titulo-libro-prestamo").value = ""
+                mostrarNotificacion("Información", "No hay copias disponibles de este libro", "warning")
             }
         } else {
-            document.getElementById("book-title-loan").value = ""
-            showToast("Información", "Libro no encontrado", "warning")
+            document.getElementById("titulo-libro-prestamo").value = ""
+            mostrarNotificacion("Información", "Libro no encontrado", "warning")
         }
     })
 
-    // Edit Book Button (in modal)
-    document.getElementById("btn-edit-book").addEventListener("click", () => {
-        const bookId = document.getElementById("modal-book-isbn").textContent
-        const book = books.find((b) => b.isbn === bookId)
+    // Botón Editar Libro (en modal)
+    document.getElementById("btn-editar-libro").addEventListener("click", () => {
+        const idLibro = document.getElementById("modal-isbn-libro").textContent
+        const libro = libros.find((b) => b.isbn === idLibro)
 
-        if (book) {
-            // Fill edit form
-            document.getElementById("edit-book-id").value = book.id
-            document.getElementById("edit-book-isbn").value = book.isbn
-            document.getElementById("edit-book-title").value = book.title
-            document.getElementById("edit-book-author").value = book.author
-            document.getElementById("edit-book-year").value = book.year
-            document.getElementById("edit-book-publisher").value = book.publisher
-            document.getElementById("edit-book-type").value = book.type
-            document.getElementById("edit-book-description").value = book.description
-            document.getElementById("edit-book-copies").value = book.copies
-            document.getElementById("edit-book-location").value = book.location
+        if (libro) {
+            // Llenar formulario de edición
+            document.getElementById("editar-id-libro").value = libro.id
+            document.getElementById("editar-isbn-libro").value = libro.isbn
+            document.getElementById("editar-titulo-libro").value = libro.titulo
+            document.getElementById("editar-autor-libro").value = libro.autor
+            document.getElementById("editar-anio-libro").value = libro.anio
+            document.getElementById("editar-editorial-libro").value = libro.editorial
+            document.getElementById("editar-tipo-libro").value = libro.tipo
+            document.getElementById("editar-descripcion-libro").value = libro.descripcion
+            document.getElementById("editar-copias-libro").value = libro.copias
+            document.getElementById("editar-ubicacion-libro").value = libro.ubicacion
 
-            // Generate dynamic fields
-            generateDynamicFields(book.type, document.getElementById("edit-dynamic-fields"), book.specificDetails)
+            // Generar campos dinámicos
+            generarCamposDinamicos(libro.tipo, document.getElementById("editar-campos-dinamicos"), libro.detallesEspecificos)
 
-            // Hide book details modal and show edit modal
-            bookDetailsModal.hide()
-            editBookModal.show()
+            // Ocultar modal de detalles y mostrar modal de edición
+            modalDetallesLibro.hide()
+            modalEditarLibro.show()
         }
     })
 
-    // Save Edit Button
-    document.getElementById("btn-save-edit").addEventListener("click", () => {
-        const bookId = document.getElementById("edit-book-id").value
-        const bookIndex = books.findIndex((b) => b.id === bookId)
+    // Botón Guardar Edición
+    document.getElementById("btn-guardar-edicion").addEventListener("click", () => {
+        const idLibro = document.getElementById("editar-id-libro").value
+        const indiceLibro = libros.findIndex((b) => b.id === idLibro)
 
-        if (bookIndex !== -1) {
-            const updatedBook = {
-                id: bookId,
-                isbn: document.getElementById("edit-book-isbn").value,
-                title: document.getElementById("edit-book-title").value,
-                author: document.getElementById("edit-book-author").value,
-                year: document.getElementById("edit-book-year").value,
-                publisher: document.getElementById("edit-book-publisher").value,
-                type: document.getElementById("edit-book-type").value,
-                description: document.getElementById("edit-book-description").value,
-                copies: Number.parseInt(document.getElementById("edit-book-copies").value),
-                availableCopies: books[bookIndex].availableCopies,
-                location: document.getElementById("edit-book-location").value,
-                cover:
-                    document.getElementById("edit-book-cover").files.length > 0
-                        ? URL.createObjectURL(document.getElementById("edit-book-cover").files[0])
-                        : books[bookIndex].cover,
-                specificDetails: getSpecificDetails(document.getElementById("edit-book-type").value),
+        if (indiceLibro !== -1) {
+            const libroActualizado = {
+                id: idLibro,
+                isbn: document.getElementById("editar-isbn-libro").value,
+                titulo: document.getElementById("editar-titulo-libro").value,
+                autor: document.getElementById("editar-autor-libro").value,
+                anio: document.getElementById("editar-anio-libro").value,
+                editorial: document.getElementById("editar-editorial-libro").value,
+                tipo: document.getElementById("editar-tipo-libro").value,
+                descripcion: document.getElementById("editar-descripcion-libro").value,
+                copias: Number.parseInt(document.getElementById("editar-copias-libro").value),
+                copiasDisponibles: libros[indiceLibro].copiasDisponibles,
+                ubicacion: document.getElementById("editar-ubicacion-libro").value,
+                portada:
+                    document.getElementById("editar-portada-libro").files.length > 0
+                        ? URL.createObjectURL(document.getElementById("editar-portada-libro").files[0])
+                        : libros[indiceLibro].portada,
+                detallesEspecificos: obtenerDetallesEspecificos(document.getElementById("editar-tipo-libro").value),
             }
 
-            // Update book
-            books[bookIndex] = updatedBook
+            // Actualizar libro
+            libros[indiceLibro] = libroActualizado
 
-            // Add to recent activity
-            addActivity(`Libro actualizado: "${updatedBook.title}"`)
+            // Agregar a actividad reciente
+            agregarActividad(`Libro actualizado: "${libroActualizado.titulo}"`)
 
-            // Show success message
-            showToast("Éxito", "Libro actualizado correctamente", "success")
+            // Mostrar mensaje de éxito
+            mostrarNotificacion("Éxito", "Libro actualizado correctamente", "success")
 
-            // Hide modal and update book list
-            editBookModal.hide()
-            renderBooksList()
+            // Ocultar modal y actualizar lista de libros
+            modalEditarLibro.hide()
+            renderizarListaLibros()
         }
     })
 
-    // Delete Book Button
-    document.getElementById("btn-delete-book").addEventListener("click", () => {
-        const bookId = document.getElementById("edit-book-id").value
+    // Botón Eliminar Libro
+    document.getElementById("btn-eliminar-libro").addEventListener("click", () => {
+        const idLibro = document.getElementById("editar-id-libro").value
 
-        // Set up confirmation modal
-        document.getElementById("confirmation-title").textContent = "Eliminar Libro"
-        document.getElementById("confirmation-message").textContent =
+        // Configurar modal de confirmación
+        document.getElementById("titulo-confirmacion").textContent = "Eliminar Libro"
+        document.getElementById("mensaje-confirmacion").textContent =
             "¿Está seguro que desea eliminar este libro? Esta acción no se puede deshacer."
 
-        // Set up confirm button
-        document.getElementById("btn-confirm").onclick = () => {
-            const bookIndex = books.findIndex((b) => b.id === bookId)
+        // Configurar botón de confirmación
+        document.getElementById("btn-confirmar").onclick = () => {
+            const indiceLibro = libros.findIndex((b) => b.id === idLibro)
 
-            if (bookIndex !== -1) {
-                const deletedBook = books[bookIndex]
+            if (indiceLibro !== -1) {
+                const libroEliminado = libros[indiceLibro]
 
-                // Check if book has active loans
-                const activeLoans = loans.filter((l) => l.bookId === deletedBook.isbn && l.status === "active")
+                // Verificar si el libro tiene préstamos activos
+                const prestamosActivos = prestamos.filter((l) => l.idLibro === libroEliminado.isbn && l.estado === "activo")
 
-                if (activeLoans.length > 0) {
-                    showToast("Error", "No se puede eliminar un libro con préstamos activos", "danger")
+                if (prestamosActivos.length > 0) {
+                    mostrarNotificacion("Error", "No se puede eliminar un libro con préstamos activos", "danger")
                 } else {
-                    // Remove book
-                    books.splice(bookIndex, 1)
+                    // Eliminar libro
+                    libros.splice(indiceLibro, 1)
 
-                    // Add to recent activity
-                    addActivity(`Libro eliminado: "${deletedBook.title}"`)
+                    // Agregar a actividad reciente
+                    agregarActividad(`Libro eliminado: "${libroEliminado.titulo}"`)
 
-                    // Show success message
-                    showToast("Éxito", "Libro eliminado correctamente", "success")
+                    // Mostrar mensaje de éxito
+                    mostrarNotificacion("Éxito", "Libro eliminado correctamente", "success")
 
-                    // Update book list
-                    renderBooksList()
-                    updateStats()
+                    // Actualizar lista de libros
+                    renderizarListaLibros()
+                    actualizarEstadisticas()
                 }
             }
 
-            // Hide modals
-            confirmationModal.hide()
-            editBookModal.hide()
+            // Ocultar modales
+            modalConfirmacion.hide()
+            modalEditarLibro.hide()
         }
 
-        // Show confirmation modal
-        confirmationModal.show()
+        // Mostrar modal de confirmación
+        modalConfirmacion.show()
     })
 
-    // Loan Book Button (in modal)
-    document.getElementById("btn-loan-book").addEventListener("click", () => {
-        const bookId = document.getElementById("modal-book-isbn").textContent
-        const book = books.find((b) => b.isbn === bookId)
+    // Botón Prestar Libro (en modal)
+    document.getElementById("btn-prestar-libro").addEventListener("click", () => {
+        const idLibro = document.getElementById("modal-isbn-libro").textContent
+        const libro = libros.find((b) => b.isbn === idLibro)
 
-        if (book && book.availableCopies > 0) {
-            // Fill loan form
-            document.getElementById("book-id-loan").value = book.isbn
-            document.getElementById("book-title-loan").value = book.title
+        if (libro && libro.copiasDisponibles > 0) {
+            // Llenar formulario de préstamo
+            document.getElementById("id-libro-prestamo").value = libro.isbn
+            document.getElementById("titulo-libro-prestamo").value = libro.titulo
 
-            // Hide book details modal
-            bookDetailsModal.hide()
+            // Ocultar modal de detalles
+            modalDetallesLibro.hide()
 
-            // Navigate to loans section and select new loan tab
-            document.getElementById("nav-loans").click()
-            document.getElementById("new-loan-tab").click()
+            // Navegar a sección de préstamos y seleccionar pestaña de nuevo préstamo
+            document.getElementById("nav-prestamos").click()
+            document.getElementById("nuevo-prestamo-tab").click()
 
-            // Focus on patron ID field
-            document.getElementById("patron-id").focus()
+            // Enfocar campo de ID de usuario
+            document.getElementById("id-usuario").focus()
         } else {
-            showToast("Información", "No hay copias disponibles de este libro", "warning")
+            mostrarNotificacion("Información", "No hay copias disponibles de este libro", "warning")
         }
     })
 
-    // Return Book Button (in active loans)
+    // Botón Devolver Libro (en préstamos activos)
     document.addEventListener("click", (e) => {
-        if (e.target && e.target.classList.contains("btn-return-loan")) {
-            const loanId = e.target.getAttribute("data-loan-id")
-            const loan = loans.find((l) => l.id === loanId)
+        if (e.target && e.target.classList.contains("btn-devolver-prestamo")) {
+            const idPrestamo = e.target.getAttribute("data-prestamo-id")
+            const prestamo = prestamos.find((l) => l.id === idPrestamo)
 
-            if (loan) {
-                // Fill return form
-                document.getElementById("return-loan-id").value = loan.id
-                document.getElementById("return-book-title").textContent = loan.bookTitle
-                document.getElementById("return-patron-name").textContent = loan.patronName
-                document.getElementById("return-loan-date").textContent = formatDate(loan.loanDate)
-                document.getElementById("return-expected-date").textContent = formatDate(loan.returnDate)
-                document.getElementById("return-actual-date").value = getCurrentDate()
+            if (prestamo) {
+                // Llenar formulario de devolución
+                document.getElementById("devolucion-id-prestamo").value = prestamo.id
+                document.getElementById("devolucion-titulo-libro").textContent = prestamo.tituloLibro
+                document.getElementById("devolucion-nombre-usuario").textContent = prestamo.nombreUsuario
+                document.getElementById("devolucion-fecha-prestamo").textContent = formatearFecha(prestamo.fechaPrestamo)
+                document.getElementById("devolucion-fecha-esperada").textContent = formatearFecha(prestamo.fechaDevolucion)
+                document.getElementById("devolucion-fecha-real").value = obtenerFechaActual()
 
-                // Show return modal
-                returnBookModal.show()
+                // Mostrar modal de devolución
+                modalDevolucionLibro.show()
             }
         }
     })
 
-    // Save Return Button
-    document.getElementById("btn-save-return").addEventListener("click", () => {
-        const loanId = document.getElementById("return-loan-id").value
-        const loanIndex = loans.findIndex((l) => l.id === loanId)
+    // Botón Guardar Devolución
+    document.getElementById("btn-guardar-devolucion").addEventListener("click", () => {
+        const idPrestamo = document.getElementById("devolucion-id-prestamo").value
+        const indicePrestamo = prestamos.findIndex((l) => l.id === idPrestamo)
 
-        if (loanIndex !== -1) {
-            const loan = loans[loanIndex]
-            const book = books.find((b) => b.isbn === loan.bookId)
+        if (indicePrestamo !== -1) {
+            const prestamo = prestamos[indicePrestamo]
+            const libro = libros.find((b) => b.isbn === prestamo.idLibro)
 
-            // Update loan
-            loan.actualReturnDate = document.getElementById("return-actual-date").value
-            loan.condition = document.getElementById("return-condition").value
-            loan.notes = document.getElementById("return-notes").value
-            loan.status = "returned"
+            // Actualizar préstamo
+            prestamo.fechaDevolucionReal = document.getElementById("devolucion-fecha-real").value
+            prestamo.estado = document.getElementById("devolucion-estado").value
+            prestamo.notas = document.getElementById("devolucion-notas").value
+            prestamo.estado = "devuelto"
 
-            // Update book available copies
-            if (book && loan.condition !== "lost") {
-                book.availableCopies++
+            // Actualizar copias disponibles del libro
+            if (libro && prestamo.estado !== "perdido") {
+                libro.copiasDisponibles++
             }
 
-            // Add to recent activity
-            addActivity(`Libro devuelto: "${loan.bookTitle}" por ${loan.patronName}`)
+            // Agregar a actividad reciente
+            agregarActividad(`Libro devuelto: "${prestamo.tituloLibro}" por ${prestamo.nombreUsuario}`)
 
-            // Show success message
-            showToast("Éxito", "Devolución registrada correctamente", "success")
+            // Mostrar mensaje de éxito
+            mostrarNotificacion("Éxito", "Devolución registrada correctamente", "success")
 
-            // Hide modal and update loans list
-            returnBookModal.hide()
-            renderActiveLoans()
-            updateStats()
+            // Ocultar modal y actualizar lista de préstamos
+            modalDevolucionLibro.hide()
+            renderizarPrestamosActivos()
+            actualizarEstadisticas()
         }
     })
 
-    // View Book Details (in book list)
+    // Ver Detalles del Libro (en lista de libros)
     document.addEventListener("click", (e) => {
-        if (e.target && e.target.classList.contains("btn-view-book")) {
-            const bookId = e.target.getAttribute("data-book-id")
-            const book = books.find((b) => b.isbn === bookId)
+        if (e.target && e.target.classList.contains("btn-ver-libro")) {
+            const idLibro = e.target.getAttribute("data-book-id")
+            const libro = libros.find((b) => b.isbn === idLibro)
 
-            if (book) {
-                // Fill modal with book details
-                document.getElementById("modal-book-title").textContent = "Detalles del Libro"
-                document.getElementById("modal-book-title-header").textContent = book.title
-                document.getElementById("modal-book-author").textContent = book.author
-                document.getElementById("modal-book-isbn").textContent = book.isbn
-                document.getElementById("modal-book-type").textContent = getBookTypeName(book.type)
-                document.getElementById("modal-book-year").textContent = book.year
-                document.getElementById("modal-book-publisher").textContent = book.publisher
-                document.getElementById("modal-book-location").textContent = book.location
-                document.getElementById("modal-book-description").textContent = book.description
-                document.getElementById("modal-book-cover").src = book.cover
+            if (libro) {
+                // Llenar modal con detalles del libro
+                document.getElementById("modal-titulo-libro").textContent = "Detalles del Libro"
+                document.getElementById("modal-encabezado-titulo-libro").textContent = libro.titulo
+                document.getElementById("modal-autor-libro").textContent = libro.autor
+                document.getElementById("modal-isbn-libro").textContent = libro.isbn
+                document.getElementById("modal-tipo-libro").textContent = obtenerNombreTipoLibro(libro.tipo)
+                document.getElementById("modal-anio-libro").textContent = libro.anio
+                document.getElementById("modal-editorial-libro").textContent = libro.editorial
+                document.getElementById("modal-ubicacion-libro").textContent = libro.ubicacion
+                document.getElementById("modal-descripcion-libro").textContent = libro.descripcion
+                document.getElementById("modal-portada-libro").src = libro.portada
 
-                // Set availability badge
-                const availabilityBadge = document.getElementById("modal-book-availability")
-                if (book.availableCopies > 0) {
-                    availabilityBadge.textContent = "Disponible"
-                    availabilityBadge.className = "badge bg-success mb-2"
-                    document.getElementById("btn-loan-book").disabled = false
+                // Establecer badge de disponibilidad
+                const badgeDisponibilidad = document.getElementById("modal-disponibilidad-libro")
+                if (libro.copiasDisponibles > 0) {
+                    badgeDisponibilidad.textContent = "Disponible"
+                    badgeDisponibilidad.className = "badge bg-success mb-2"
+                    document.getElementById("btn-prestar-libro").disabled = false
                 } else {
-                    availabilityBadge.textContent = "No Disponible"
-                    availabilityBadge.className = "badge bg-danger mb-2"
-                    document.getElementById("btn-loan-book").disabled = true
+                    badgeDisponibilidad.textContent = "No Disponible"
+                    badgeDisponibilidad.className = "badge bg-danger mb-2"
+                    document.getElementById("btn-prestar-libro").disabled = true
                 }
 
-                // Set copies text
-                document.getElementById("modal-book-copies").textContent =
-                    `${book.availableCopies} de ${book.copies} copias disponibles`
+                // Establecer texto de copias
+                document.getElementById("modal-copias-libro").textContent =
+                    `${libro.copiasDisponibles} de ${libro.copias} copias disponibles`
 
-                // Set specific details
-                const specificDetailsContainer = document.getElementById("modal-book-specific-details")
-                specificDetailsContainer.innerHTML = ""
+                // Establecer detalles específicos
+                const contenedorDetallesEspecificos = document.getElementById("modal-detalles-especificos-libro")
+                contenedorDetallesEspecificos.innerHTML = ""
 
-                if (book.specificDetails) {
-                    const detailsTitle = document.createElement("h5")
-                    detailsTitle.textContent = "Detalles Específicos"
-                    specificDetailsContainer.appendChild(detailsTitle)
+                if (libro.detallesEspecificos) {
+                    const tituloDetalles = document.createElement("h5")
+                    tituloDetalles.textContent = "Detalles Específicos"
+                    contenedorDetallesEspecificos.appendChild(tituloDetalles)
 
-                    const detailsList = document.createElement("ul")
-                    detailsList.className = "list-group list-group-flush"
+                    const listaDetalles = document.createElement("ul")
+                    listaDetalles.className = "list-group list-group-flush"
 
-                    for (const [key, value] of Object.entries(book.specificDetails)) {
+                    for (const [clave, valor] of Object.entries(libro.detallesEspecificos)) {
                         const item = document.createElement("li")
                         item.className = "list-group-item"
-                        item.innerHTML = `<strong>${formatFieldName(key)}:</strong> ${value}`
-                        detailsList.appendChild(item)
+                        item.innerHTML = `<strong>${formatearNombreCampo(clave)}:</strong> ${valor}`
+                        listaDetalles.appendChild(item)
                     }
 
-                    specificDetailsContainer.appendChild(detailsList)
+                    contenedorDetallesEspecificos.appendChild(listaDetalles)
                 }
 
-                // Show modal
-                bookDetailsModal.show()
+                // Mostrar modal
+                modalDetallesLibro.show()
             }
         }
     })
 
-    // Initialize with sample data
-    function initializeSampleData() {
-        // Sample books
-        books = [
+    // Inicializar con datos de ejemplo
+    function inicializarDatosEjemplo() {
+        // Libros de ejemplo
+        libros = [
             {
-                id: generateId(),
+                id: generarId(),
                 isbn: "9780061120084",
-                title: "Matar a un ruiseñor",
-                author: "Harper Lee",
-                year: "1960",
-                publisher: "J. B. Lippincott & Co.",
-                type: "ficcion",
-                description:
+                titulo: "Matar a un ruiseñor",
+                autor: "Harper Lee",
+                anio: "1960",
+                editorial: "J. B. Lippincott & Co.",
+                tipo: "ficcion",
+                descripcion:
                     "Una historia sobre la injusticia racial y la pérdida de la inocencia en el sur de Estados Unidos.",
-                copies: 5,
-                availableCopies: 3,
-                location: "Estante A-12",
-                cover: "/placeholder.svg?height=200&width=150",
-                specificDetails: {
+                copias: 5,
+                copiasDisponibles: 3,
+                ubicacion: "Estante A-12",
+                portada: "/placeholder.svg?height=200&width=150",
+                detallesEspecificos: {
                     genero: "Novela",
                     premios: "Premio Pulitzer",
                     audiencia: "Adultos",
                 },
             },
             {
-                id: generateId(),
+                id: generarId(),
                 isbn: "9780307474278",
-                title: "El Principito",
-                author: "Antoine de Saint-Exupéry",
-                year: "1943",
-                publisher: "Reynal & Hitchcock",
-                type: "ficcion",
-                description: "Una fábula filosófica sobre la naturaleza humana y las relaciones.",
-                copies: 3,
-                availableCopies: 2,
-                location: "Estante B-05",
-                cover: "/placeholder.svg?height=200&width=150",
-                specificDetails: {
+                titulo: "El Principito",
+                autor: "Antoine de Saint-Exupéry",
+                anio: "1943",
+                editorial: "Reynal & Hitchcock",
+                tipo: "ficcion",
+                descripcion: "Una fábula filosófica sobre la naturaleza humana y las relaciones.",
+                copias: 3,
+                copiasDisponibles: 2,
+                ubicacion: "Estante B-05",
+                portada: "/placeholder.svg?height=200&width=150",
+                detallesEspecificos: {
                     genero: "Fábula",
                     premios: "Ninguno",
                     audiencia: "Todas las edades",
                 },
             },
             {
-                id: generateId(),
+                id: generarId(),
                 isbn: "9780553211404",
-                title: "Breve historia del tiempo",
-                author: "Stephen Hawking",
-                year: "1988",
-                publisher: "Bantam Books",
-                type: "no-ficcion",
-                description: "Un libro de divulgación científica sobre cosmología.",
-                copies: 2,
-                availableCopies: 1,
-                location: "Estante C-08",
-                cover: "/placeholder.svg?height=200&width=150",
-                specificDetails: {
+                titulo: "Breve historia del tiempo",
+                autor: "Stephen Hawking",
+                anio: "1988",
+                editorial: "Bantam Books",
+                tipo: "no-ficcion",
+                descripcion: "Un libro de divulgación científica sobre cosmología.",
+                copias: 2,
+                copiasDisponibles: 1,
+                ubicacion: "Estante C-08",
+                portada: "/placeholder.svg?height=200&width=150",
+                detallesEspecificos: {
                     area: "Ciencia",
                     publico: "General",
                     nivel: "Intermedio",
                 },
             },
             {
-                id: generateId(),
+                id: generarId(),
                 isbn: "9780198501053",
-                title: "Diccionario Oxford de Matemáticas",
-                author: "James Nicholson",
-                year: "2009",
-                publisher: "Oxford University Press",
-                type: "referencia",
-                description: "Un diccionario completo de términos matemáticos.",
-                copies: 1,
-                availableCopies: 0,
-                location: "Estante D-01",
-                cover: "/placeholder.svg?height=200&width=150",
-                specificDetails: {
+                titulo: "Diccionario Oxford de Matemáticas",
+                autor: "James Nicholson",
+                anio: "2009",
+                editorial: "Oxford University Press",
+                tipo: "referencia",
+                descripcion: "Un diccionario completo de términos matemáticos.",
+                copias: 1,
+                copiasDisponibles: 0,
+                ubicacion: "Estante D-01",
+                portada: "/placeholder.svg?height=200&width=150",
+                detallesEspecificos: {
                     campo: "Matemáticas",
                     prestable: "No",
                     edicion: "2da Edición",
@@ -586,478 +670,553 @@ document.addEventListener("DOMContentLoaded", () => {
             },
         ]
 
-        // Sample patrons
-        patrons = [
+        // Usuarios de ejemplo
+        usuarios = [
             {
                 id: "P001",
-                name: "Juan Pérez",
+                nombre: "Juan Pérez",
                 email: "juan.perez@email.com",
-                phone: "3001234567",
+                telefono: "3001234567",
             },
             {
                 id: "P002",
-                name: "María López",
+                nombre: "María López",
                 email: "maria.lopez@email.com",
-                phone: "3109876543",
+                telefono: "3109876543",
             },
             {
                 id: "P003",
-                name: "Carlos Rodríguez",
+                nombre: "Carlos Rodríguez",
                 email: "carlos.rodriguez@email.com",
-                phone: "3207654321",
+                telefono: "3207654321",
             },
         ]
 
-        // Sample loans
-        loans = [
+        // Préstamos de ejemplo
+        prestamos = [
             {
-                id: generateId(),
-                patronId: "P001",
-                patronName: "Juan Pérez",
-                bookId: "9780198501053",
-                bookTitle: "Diccionario Oxford de Matemáticas",
-                loanDate: "2023-05-01",
-                returnDate: "2023-05-15",
-                actualReturnDate: null,
-                status: "active",
+                id: generarId(),
+                idUsuario: "P001",
+                nombreUsuario: "Juan Pérez",
+                idLibro: "9780198501053",
+                tituloLibro: "Diccionario Oxford de Matemáticas",
+                fechaPrestamo: "2023-05-01",
+                fechaDevolucion: "2023-05-15",
+                fechaDevolucionReal: null,
+                estado: "activo",
             },
             {
-                id: generateId(),
-                patronId: "P002",
-                patronName: "María López",
-                bookId: "9780061120084",
-                bookTitle: "Matar a un ruiseñor",
-                loanDate: "2023-04-20",
-                returnDate: "2023-05-04",
-                actualReturnDate: "2023-05-03",
-                status: "returned",
+                id: generarId(),
+                idUsuario: "P002",
+                nombreUsuario: "María López",
+                idLibro: "9780061120084",
+                tituloLibro: "Matar a un ruiseñor",
+                fechaPrestamo: "2023-04-20",
+                fechaDevolucion: "2023-05-04",
+                fechaDevolucionReal: "2023-05-03",
+                estado: "devuelto",
             },
         ]
     }
 
-    // Render books list
-    function renderBooksList() {
-        const searchTerm = searchCatalog.value.toLowerCase()
-        const typeFilter = filterType.value
-        const availabilityFilter = filterAvailability.value
+    // Renderizar lista de libros
+    function renderizarListaLibros() {
+        const terminoBusqueda = buscarCatalogo.value.toLowerCase()
+        const tipoFiltro = filtroTipo.value
+        const disponibilidadFiltro = filtroDisponibilidad.value
 
-        // Filter books
-        const filteredBooks = books.filter((book) => {
-            // Search term filter
-            const matchesSearch =
-                book.title.toLowerCase().includes(searchTerm) ||
-                book.author.toLowerCase().includes(searchTerm) ||
-                book.isbn.includes(searchTerm)
+        // Destruir la tabla DataTable existente si existe
+        if ($.fn.DataTable.isDataTable('#tabla-libros')) {
+            $('#tabla-libros').DataTable().destroy();
+        }
 
-            // Type filter
-            const matchesType = typeFilter === "all" || book.type === typeFilter
+        // Filtrar libros
+        const librosFiltrados = libros.filter((libro) => {
+            // Filtro por término de búsqueda
+            const coincideBusqueda =
+                libro.titulo.toLowerCase().includes(terminoBusqueda) ||
+                libro.autor.toLowerCase().includes(terminoBusqueda) ||
+                libro.isbn.includes(terminoBusqueda)
 
-            // Availability filter
-            const matchesAvailability =
-                availabilityFilter === "all" ||
-                (availabilityFilter === "available" && book.availableCopies > 0) ||
-                (availabilityFilter === "loaned" && book.availableCopies === 0)
+            // Filtro por tipo
+            const coincideTipo = tipoFiltro === "all" || libro.tipo === tipoFiltro
 
-            return matchesSearch && matchesType && matchesAvailability
+            // Filtro por disponibilidad
+            const coincideDisponibilidad =
+                disponibilidadFiltro === "all" ||
+                (disponibilidadFiltro === "available" && libro.copiasDisponibles > 0) ||
+                (disponibilidadFiltro === "loaned" && libro.copiasDisponibles === 0)
+
+            return coincideBusqueda && coincideTipo && coincideDisponibilidad
         })
 
-        // Clear table
-        booksTableBody.innerHTML = ""
+        // Limpiar tabla
+        cuerpoTablaLibros.innerHTML = ""
 
-        // Check if no books found
-        if (filteredBooks.length === 0) {
-            booksTableBody.innerHTML = `
-        <tr class="text-center text-muted">
-          <td colspan="6">No se encontraron libros con los criterios de búsqueda</td>
-        </tr>
-      `
+        // Verificar si no se encontraron libros
+        if (librosFiltrados.length === 0) {
+            cuerpoTablaLibros.innerHTML = `
+            <tr class="text-center text-muted">
+              <td colspan="6">No se encontraron libros con los criterios de búsqueda</td>
+            </tr>
+          `
+            // Inicializar DataTable vacía
+            $('#tabla-libros').DataTable(configDataTables);
             return
         }
 
-        // Render books
-        filteredBooks.forEach((book) => {
-            const row = document.createElement("tr")
+        // Renderizar libros
+        librosFiltrados.forEach((libro) => {
+            const fila = document.createElement("tr")
 
-            row.innerHTML = `
-        <td>${book.isbn}</td>
-        <td>${book.title}</td>
-        <td>${book.author}</td>
-        <td>${getBookTypeName(book.type)}</td>
-        <td>
-          <span class="badge ${book.availableCopies > 0 ? "bg-success" : "bg-danger"}">
-            ${book.availableCopies > 0 ? "Disponible" : "No disponible"}
-          </span>
-        </td>
-        <td>
-          <button class="btn btn-sm btn-primary btn-view-book" data-book-id="${book.isbn}">
-            <i class="bi bi-eye"></i>
-          </button>
-        </td>
-      `
+            fila.innerHTML = `
+            <td>${libro.isbn}</td>
+            <td>${libro.titulo}</td>
+            <td>${libro.autor}</td>
+            <td>${obtenerNombreTipoLibro(libro.tipo)}</td>
+            <td>
+              <span class="badge ${libro.copiasDisponibles > 0 ? "bg-success" : "bg-danger"}">
+                ${libro.copiasDisponibles > 0 ? "Disponible" : "No disponible"}
+              </span>
+            </td>
+            <td>
+              <button class="btn btn-sm btn-primary btn-ver-libro" data-book-id="${libro.isbn}">
+                <i class="bi bi-eye"></i>
+              </button>
+            </td>
+          `
 
-            booksTableBody.appendChild(row)
+            cuerpoTablaLibros.appendChild(fila)
         })
+
+        // Inicializar DataTable con los datos
+        $('#tabla-libros').DataTable(configDataTables);
     }
 
-    // Render active loans
-    function renderActiveLoans() {
-        const activeLoansTable = document.getElementById("active-loans-table")
-        const activeLoansOnly = loans.filter((loan) => loan.status === "active")
+    // Renderizar préstamos activos
+    function renderizarPrestamosActivos() {
+        const tablaPrestamosActivos = document.getElementById("cuerpo-tabla-prestamos-activos")
+        const prestamosActivos = prestamos.filter((prestamo) => prestamo.estado === "activo")
 
-        // Clear table
-        activeLoansTable.innerHTML = ""
+        // Destruir la tabla DataTable existente si existe
+        if ($.fn.DataTable.isDataTable('#tabla-prestamos-activos')) {
+            $('#tabla-prestamos-activos').DataTable().destroy();
+        }
 
-        // Check if no active loans
-        if (activeLoansOnly.length === 0) {
-            activeLoansTable.innerHTML = `
-        <tr class="text-center text-muted">
-          <td colspan="7">No hay préstamos activos</td>
-        </tr>
-      `
+        // Limpiar tabla
+        tablaPrestamosActivos.innerHTML = ""
+
+        // Verificar si no hay préstamos activos
+        if (prestamosActivos.length === 0) {
+            tablaPrestamosActivos.innerHTML = `
+            <tr class="text-center text-muted">
+              <td colspan="7">No hay préstamos activos</td>
+            </tr>
+          `
+            // Inicializar DataTable vacía
+            $('#tabla-prestamos-activos').DataTable(configDataTables);
             return
         }
 
-        // Render loans
-        activeLoansOnly.forEach((loan) => {
-            const row = document.createElement("tr")
+        // Renderizar préstamos
+        prestamosActivos.forEach((prestamo) => {
+            const fila = document.createElement("tr")
 
-            row.innerHTML = `
-        <td>${loan.id}</td>
-        <td>${loan.patronName}</td>
-        <td>${loan.bookTitle}</td>
-        <td>${formatDate(loan.loanDate)}</td>
-        <td>${formatDate(loan.returnDate)}</td>
-        <td>
-          <span class="badge ${isOverdue(loan.returnDate) ? "bg-danger" : "bg-warning"}">
-            ${isOverdue(loan.returnDate) ? "Vencido" : "Activo"}
-          </span>
-        </td>
-        <td>
-          <button class="btn btn-sm btn-success btn-return-loan" data-loan-id="${loan.id}">
-            <i class="bi bi-check-circle"></i> Devolver
-          </button>
-        </td>
-      `
+            fila.innerHTML = `
+            <td>${prestamo.id}</td>
+            <td>${prestamo.nombreUsuario}</td>
+            <td>${prestamo.tituloLibro}</td>
+            <td>${formatearFecha(prestamo.fechaPrestamo)}</td>
+            <td>${formatearFecha(prestamo.fechaDevolucion)}</td>
+            <td>
+              <span class="badge ${estaVencido(prestamo.fechaDevolucion) ? "bg-danger" : "bg-warning"}">
+                ${estaVencido(prestamo.fechaDevolucion) ? "Vencido" : "Activo"}
+              </span>
+            </td>
+            <td>
+              <button class="btn btn-sm btn-success btn-devolver-prestamo" data-prestamo-id="${prestamo.id}">
+                <i class="bi bi-check-circle"></i> Devolver
+              </button>
+            </td>
+          `
 
-            activeLoansTable.appendChild(row)
+            tablaPrestamosActivos.appendChild(fila)
         })
+
+        // Inicializar DataTable con los datos
+        $('#tabla-prestamos-activos').DataTable(configDataTables);
     }
 
-    // Perform quick search
-    function performQuickSearch() {
-        const searchTerm = quickSearch.value.toLowerCase()
+    // Renderizar historial de préstamos
+    function renderizarHistorialPrestamos() {
+        const tablaHistorialPrestamos = document.getElementById("cuerpo-tabla-historial-prestamos")
+        const historialPrestamos = prestamos.filter((prestamo) => prestamo.estado === "devuelto")
 
-        if (searchTerm.trim() === "") {
-            quickResults.innerHTML = `
-        <div class="quick-results-placeholder text-center text-muted">
-          <i class="bi bi-search display-4"></i>
-          <p>Los resultados de búsqueda aparecerán aquí</p>
-        </div>
-      `
+        // Destruir la tabla DataTable existente si existe
+        if ($.fn.DataTable.isDataTable('#tabla-historial-prestamos')) {
+            $('#tabla-historial-prestamos').DataTable().destroy();
+        }
+
+        // Limpiar tabla
+        tablaHistorialPrestamos.innerHTML = ""
+
+        // Verificar si no hay historial de préstamos
+        if (historialPrestamos.length === 0) {
+            tablaHistorialPrestamos.innerHTML = `
+            <tr class="text-center text-muted">
+              <td colspan="7">No hay registros en el historial</td>
+            </tr>
+          `
+            // Inicializar DataTable vacía
+            $('#tabla-historial-prestamos').DataTable(configDataTables);
             return
         }
 
-        // Filter books
-        const filteredBooks = books
+        // Renderizar préstamos
+        historialPrestamos.forEach((prestamo) => {
+            const fila = document.createElement("tr")
+
+            fila.innerHTML = `
+            <td>${prestamo.id}</td>
+            <td>${prestamo.nombreUsuario}</td>
+            <td>${prestamo.tituloLibro}</td>
+            <td>${formatearFecha(prestamo.fechaPrestamo)}</td>
+            <td>${formatearFecha(prestamo.fechaDevolucion)}</td>
+            <td>${prestamo.fechaDevolucionReal ? formatearFecha(prestamo.fechaDevolucionReal) : '-'}</td>
+            <td>
+              <span class="badge bg-success">
+                Devuelto
+              </span>
+            </td>
+          `
+
+            tablaHistorialPrestamos.appendChild(fila)
+        })
+
+        // Inicializar DataTable con los datos
+        $('#tabla-historial-prestamos').DataTable(configDataTables);
+    }
+
+    // Inicializar tabla de historial cuando se haga clic en la pestaña
+    document.getElementById('historial-prestamos-tab').addEventListener('click', function() {
+        renderizarHistorialPrestamos();
+    });
+
+    // Realizar búsqueda rápida
+    function realizarBusquedaRapida() {
+        const terminoBusqueda = busquedaRapida.value.toLowerCase()
+
+        if (terminoBusqueda.trim() === "") {
+            resultadosRapidos.innerHTML = `
+            <div class="quick-results-placeholder text-center text-muted">
+              <i class="bi bi-search display-4"></i>
+              <p>Los resultados de búsqueda aparecerán aquí</p>
+            </div>
+          `
+            return
+        }
+
+        // Filtrar libros
+        const librosFiltrados = libros
             .filter(
-                (book) =>
-                    book.title.toLowerCase().includes(searchTerm) ||
-                    book.author.toLowerCase().includes(searchTerm) ||
-                    book.isbn.includes(searchTerm),
+                (libro) =>
+                    libro.titulo.toLowerCase().includes(terminoBusqueda) ||
+                    libro.autor.toLowerCase().includes(terminoBusqueda) ||
+                    libro.isbn.includes(terminoBusqueda),
             )
-            .slice(0, 3) // Limit to 3 results
+            .slice(0, 3) // Limitar a 3 resultados
 
-        // Clear results
-        quickResults.innerHTML = ""
+        // Limpiar resultados
+        resultadosRapidos.innerHTML = ""
 
-        // Check if no books found
-        if (filteredBooks.length === 0) {
-            quickResults.innerHTML = `
-        <div class="text-center text-muted">
-          <p>No se encontraron libros con el término "${searchTerm}"</p>
-        </div>
-      `
+        // Verificar si no se encontraron libros
+        if (librosFiltrados.length === 0) {
+            resultadosRapidos.innerHTML = `
+            <div class="text-center text-muted">
+              <p>No se encontraron libros con el término "${terminoBusqueda}"</p>
+            </div>
+          `
             return
         }
 
-        // Create results list
-        const resultsList = document.createElement("ul")
-        resultsList.className = "list-group"
+        // Crear lista de resultados
+        const listaResultados = document.createElement("ul")
+        listaResultados.className = "list-group"
 
-        filteredBooks.forEach((book) => {
+        librosFiltrados.forEach((libro) => {
             const item = document.createElement("li")
             item.className = "list-group-item d-flex justify-content-between align-items-center"
 
             item.innerHTML = `
-        <div>
-          <h6 class="mb-0">${book.title}</h6>
-          <small class="text-muted">${book.author}</small>
-        </div>
-        <span class="badge ${book.availableCopies > 0 ? "bg-success" : "bg-danger"} rounded-pill">
-          ${book.availableCopies} / ${book.copies}
-        </span>
-      `
+            <div>
+              <h6 class="mb-0">${libro.titulo}</h6>
+              <small class="text-muted">${libro.autor}</small>
+            </div>
+            <span class="badge ${libro.copiasDisponibles > 0 ? "bg-success" : "bg-danger"} rounded-pill">
+              ${libro.copiasDisponibles} / ${libro.copias}
+            </span>
+          `
 
             item.addEventListener("click", () => {
-                // Fill modal with book details and show it
-                document.getElementById("modal-book-title").textContent = "Detalles del Libro"
-                document.getElementById("modal-book-title-header").textContent = book.title
-                document.getElementById("modal-book-author").textContent = book.author
-                document.getElementById("modal-book-isbn").textContent = book.isbn
-                document.getElementById("modal-book-type").textContent = getBookTypeName(book.type)
-                document.getElementById("modal-book-year").textContent = book.year
-                document.getElementById("modal-book-publisher").textContent = book.publisher
-                document.getElementById("modal-book-location").textContent = book.location
-                document.getElementById("modal-book-description").textContent = book.description
-                document.getElementById("modal-book-cover").src = book.cover
+                // Llenar modal con detalles del libro y mostrarlo
+                document.getElementById("modal-titulo-libro").textContent = "Detalles del Libro"
+                document.getElementById("modal-encabezado-titulo-libro").textContent = libro.titulo
+                document.getElementById("modal-autor-libro").textContent = libro.autor
+                document.getElementById("modal-isbn-libro").textContent = libro.isbn
+                document.getElementById("modal-tipo-libro").textContent = obtenerNombreTipoLibro(libro.tipo)
+                document.getElementById("modal-anio-libro").textContent = libro.anio
+                document.getElementById("modal-editorial-libro").textContent = libro.editorial
+                document.getElementById("modal-ubicacion-libro").textContent = libro.ubicacion
+                document.getElementById("modal-descripcion-libro").textContent = libro.descripcion
+                document.getElementById("modal-portada-libro").src = libro.portada
 
-                // Set availability badge
-                const availabilityBadge = document.getElementById("modal-book-availability")
-                if (book.availableCopies > 0) {
-                    availabilityBadge.textContent = "Disponible"
-                    availabilityBadge.className = "badge bg-success mb-2"
-                    document.getElementById("btn-loan-book").disabled = false
+                // Establecer badge de disponibilidad
+                const badgeDisponibilidad = document.getElementById("modal-disponibilidad-libro")
+                if (libro.copiasDisponibles > 0) {
+                    badgeDisponibilidad.textContent = "Disponible"
+                    badgeDisponibilidad.className = "badge bg-success mb-2"
+                    document.getElementById("btn-prestar-libro").disabled = false
                 } else {
-                    availabilityBadge.textContent = "No Disponible"
-                    availabilityBadge.className = "badge bg-danger mb-2"
-                    document.getElementById("btn-loan-book").disabled = true
+                    badgeDisponibilidad.textContent = "No Disponible"
+                    badgeDisponibilidad.className = "badge bg-danger mb-2"
+                    document.getElementById("btn-prestar-libro").disabled = true
                 }
 
-                // Set copies text
-                document.getElementById("modal-book-copies").textContent =
-                    `${book.availableCopies} de ${book.copies} copias disponibles`
+                // Establecer texto de copias
+                document.getElementById("modal-copias-libro").textContent =
+                    `${libro.copiasDisponibles} de ${libro.copias} copias disponibles`
 
-                // Set specific details
-                const specificDetailsContainer = document.getElementById("modal-book-specific-details")
-                specificDetailsContainer.innerHTML = ""
+                // Establecer detalles específicos
+                const contenedorDetallesEspecificos = document.getElementById("modal-detalles-especificos-libro")
+                contenedorDetallesEspecificos.innerHTML = ""
 
-                if (book.specificDetails) {
-                    const detailsTitle = document.createElement("h5")
-                    detailsTitle.textContent = "Detalles Específicos"
-                    specificDetailsContainer.appendChild(detailsTitle)
+                if (libro.detallesEspecificos) {
+                    const tituloDetalles = document.createElement("h5")
+                    tituloDetalles.textContent = "Detalles Específicos"
+                    contenedorDetallesEspecificos.appendChild(tituloDetalles)
 
-                    const detailsList = document.createElement("ul")
-                    detailsList.className = "list-group list-group-flush"
+                    const listaDetalles = document.createElement("ul")
+                    listaDetalles.className = "list-group list-group-flush"
 
-                    for (const [key, value] of Object.entries(book.specificDetails)) {
+                    for (const [clave, valor] of Object.entries(libro.detallesEspecificos)) {
                         const item = document.createElement("li")
                         item.className = "list-group-item"
-                        item.innerHTML = `<strong>${formatFieldName(key)}:</strong> ${value}`
-                        detailsList.appendChild(item)
+                        item.innerHTML = `<strong>${formatearNombreCampo(clave)}:</strong> ${valor}`
+                        listaDetalles.appendChild(item)
                     }
 
-                    specificDetailsContainer.appendChild(detailsList)
+                    contenedorDetallesEspecificos.appendChild(listaDetalles)
                 }
 
-                // Show modal
-                bookDetailsModal.show()
+                // Mostrar modal
+                modalDetallesLibro.show()
             })
 
-            resultsList.appendChild(item)
+            listaResultados.appendChild(item)
         })
 
-        quickResults.appendChild(resultsList)
+        resultadosRapidos.appendChild(listaResultados)
     }
 
-    // Generate dynamic fields based on book type
-    function generateDynamicFields(bookType, container, values = {}) {
-        // Clear container
-        container.innerHTML = ""
+    // Generar campos dinámicos basados en el tipo de libro
+    function generarCamposDinamicos(tipoLibro, contenedor, valores = {}) {
+        // Limpiar contenedor
+        contenedor.innerHTML = ""
 
-        // Create fields based on book type
-        if (bookType === "ficcion") {
-            container.innerHTML = `
-        <div class="row">
-          <div class="col-md-4">
-            <label for="book-genre" class="form-label">Género</label>
-            <input type="text" class="form-control" id="book-genre" value="${values.genero || ""}">
-          </div>
-          <div class="col-md-4">
-            <label for="book-awards" class="form-label">Premios</label>
-            <input type="text" class="form-control" id="book-awards" value="${values.premios || ""}">
-          </div>
-          <div class="col-md-4">
-            <label for="book-audience" class="form-label">Audiencia</label>
-            <select class="form-select" id="book-audience">
-              <option value="Niños" ${values.audiencia === "Niños" ? "selected" : ""}>Niños</option>
-              <option value="Jóvenes" ${values.audiencia === "Jóvenes" ? "selected" : ""}>Jóvenes</option>
-              <option value="Adultos" ${values.audiencia === "Adultos" ? "selected" : ""}>Adultos</option>
-              <option value="Todas las edades" ${values.audiencia === "Todas las edades" ? "selected" : ""}>Todas las edades</option>
-            </select>
-          </div>
-        </div>
-      `
-        } else if (bookType === "no-ficcion") {
-            container.innerHTML = `
-        <div class="row">
-          <div class="col-md-4">
-            <label for="book-area" class="form-label">Área Temática</label>
-            <input type="text" class="form-control" id="book-area" value="${values.area || ""}">
-          </div>
-          <div class="col-md-4">
-            <label for="book-public" class="form-label">Público Objetivo</label>
-            <input type="text" class="form-control" id="book-public" value="${values.publico || ""}">
-          </div>
-          <div class="col-md-4">
-            <label for="book-level" class="form-label">Nivel</label>
-            <select class="form-select" id="book-level">
-              <option value="Básico" ${values.nivel === "Básico" ? "selected" : ""}>Básico</option>
-              <option value="Intermedio" ${values.nivel === "Intermedio" ? "selected" : ""}>Intermedio</option>
-              <option value="Avanzado" ${values.nivel === "Avanzado" ? "selected" : ""}>Avanzado</option>
-            </select>
-          </div>
-        </div>
-      `
-        } else if (bookType === "referencia") {
-            container.innerHTML = `
-        <div class="row">
-          <div class="col-md-4">
-            <label for="book-field" class="form-label">Campo Académico</label>
-            <input type="text" class="form-control" id="book-field" value="${values.campo || ""}">
-          </div>
-          <div class="col-md-4">
-            <label for="book-loanable" class="form-label">¿Puede ser prestado?</label>
-            <select class="form-select" id="book-loanable">
-              <option value="Sí" ${values.prestable === "Sí" ? "selected" : ""}>Sí</option>
-              <option value="No" ${values.prestable === "No" ? "selected" : ""}>No</option>
-            </select>
-          </div>
-          <div class="col-md-4">
-            <label for="book-edition" class="form-label">Edición</label>
-            <input type="text" class="form-control" id="book-edition" value="${values.edicion || ""}">
-          </div>
-        </div>
-      `
+        // Crear campos basados en el tipo de libro
+        if (tipoLibro === "ficcion") {
+            contenedor.innerHTML = `
+            <div class="row">
+              <div class="col-md-4">
+                <label for="libro-genero" class="form-label">Género</label>
+                <input type="text" class="form-control" id="libro-genero" value="${valores.genero || ""}">
+              </div>
+              <div class="col-md-4">
+                <label for="libro-premios" class="form-label">Premios</label>
+                <input type="text" class="form-control" id="libro-premios" value="${valores.premios || ""}">
+              </div>
+              <div class="col-md-4">
+                <label for="libro-audiencia" class="form-label">Audiencia</label>
+                <select class="form-select" id="libro-audiencia">
+                  <option value="Niños" ${valores.audiencia === "Niños" ? "selected" : ""}>Niños</option>
+                  <option value="Jóvenes" ${valores.audiencia === "Jóvenes" ? "selected" : ""}>Jóvenes</option>
+                  <option value="Adultos" ${valores.audiencia === "Adultos" ? "selected" : ""}>Adultos</option>
+                  <option value="Todas las edades" ${valores.audiencia === "Todas las edades" ? "selected" : ""}>Todas las edades</option>
+                </select>
+              </div>
+            </div>
+          `
+        } else if (tipoLibro === "no-ficcion") {
+            contenedor.innerHTML = `
+            <div class="row">
+              <div class="col-md-4">
+                <label for="libro-area" class="form-label">Área Temática</label>
+                <input type="text" class="form-control" id="libro-area" value="${valores.area || ""}">
+              </div>
+              <div class="col-md-4">
+                <label for="libro-publico" class="form-label">Público Objetivo</label>
+                <input type="text" class="form-control" id="libro-publico" value="${valores.publico || ""}">
+              </div>
+              <div class="col-md-4">
+                <label for="libro-nivel" class="form-label">Nivel</label>
+                <select class="form-select" id="libro-nivel">
+                  <option value="Básico" ${valores.nivel === "Básico" ? "selected" : ""}>Básico</option>
+                  <option value="Intermedio" ${valores.nivel === "Intermedio" ? "selected" : ""}>Intermedio</option>
+                  <option value="Avanzado" ${valores.nivel === "Avanzado" ? "selected" : ""}>Avanzado</option>
+                </select>
+              </div>
+            </div>
+          `
+        } else if (tipoLibro === "referencia") {
+            contenedor.innerHTML = `
+            <div class="row">
+              <div class="col-md-4">
+                <label for="libro-campo" class="form-label">Campo Académico</label>
+                <input type="text" class="form-control" id="libro-campo" value="${valores.campo || ""}">
+              </div>
+              <div class="col-md-4">
+                <label for="libro-prestable" class="form-label">¿Puede ser prestado?</label>
+                <select class="form-select" id="libro-prestable">
+                  <option value="Sí" ${valores.prestable === "Sí" ? "selected" : ""}>Sí</option>
+                  <option value="No" ${valores.prestable === "No" ? "selected" : ""}>No</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label for="libro-edicion" class="form-label">Edición</label>
+                <input type="text" class="form-control" id="libro-edicion" value="${valores.edicion || ""}">
+              </div>
+            </div>
+          `
         }
     }
 
-    // Get specific details from form based on book type
-    function getSpecificDetails(bookType) {
-        if (bookType === "ficcion") {
+    // Obtener detalles específicos del formulario basados en el tipo de libro
+    function obtenerDetallesEspecificos(tipoLibro) {
+        if (tipoLibro === "ficcion") {
             return {
-                genero: document.getElementById("book-genre")?.value || "",
-                premios: document.getElementById("book-awards")?.value || "",
-                audiencia: document.getElementById("book-audience")?.value || "Todas las edades",
+                genero: document.getElementById("libro-genero")?.value || "",
+                premios: document.getElementById("libro-premios")?.value || "",
+                audiencia: document.getElementById("libro-audiencia")?.value || "Todas las edades",
             }
-        } else if (bookType === "no-ficcion") {
+        } else if (tipoLibro === "no-ficcion") {
             return {
-                area: document.getElementById("book-area")?.value || "",
-                publico: document.getElementById("book-public")?.value || "",
-                nivel: document.getElementById("book-level")?.value || "Intermedio",
+                area: document.getElementById("libro-area")?.value || "",
+                publico: document.getElementById("libro-publico")?.value || "",
+                nivel: document.getElementById("libro-nivel")?.value || "Intermedio",
             }
-        } else if (bookType === "referencia") {
+        } else if (tipoLibro === "referencia") {
             return {
-                campo: document.getElementById("book-field")?.value || "",
-                prestable: document.getElementById("book-loanable")?.value || "No",
-                edicion: document.getElementById("book-edition")?.value || "",
+                campo: document.getElementById("libro-campo")?.value || "",
+                prestable: document.getElementById("libro-prestable")?.value || "No",
+                edicion: document.getElementById("libro-edicion")?.value || "",
             }
         }
 
         return {}
     }
 
-    // Update statistics
-    function updateStats() {
-        document.getElementById("total-books").textContent = books.length
+    // Actualizar estadísticas
+    function actualizarEstadisticas() {
+        document.getElementById("total-libros").textContent = libros.length
 
-        const availableBooks = books.reduce((total, book) => total + book.availableCopies, 0)
-        document.getElementById("available-books").textContent = availableBooks
+        const librosDisponibles = libros.reduce((total, libro) => total + libro.copiasDisponibles, 0)
+        document.getElementById("libros-disponibles").textContent = librosDisponibles
 
-        const activeLoansCount = loans.filter((loan) => loan.status === "active").length
-        document.getElementById("active-loans").textContent = activeLoansCount
+        const prestamosActivosCount = prestamos.filter((prestamo) => prestamo.estado === "activo").length
+        document.getElementById("prestamos-activos").textContent = prestamosActivosCount
     }
 
-    // Add activity to recent activity list
-    function addActivity(activity) {
-        const now = new Date()
-        activities.unshift({
-            text: activity,
-            timestamp: now,
+    // Agregar actividad a la lista de actividad reciente
+    function agregarActividad(actividad) {
+        const ahora = new Date()
+        actividades.unshift({
+            texto: actividad,
+            timestamp: ahora,
         })
 
-        // Keep only the last 10 activities
-        if (activities.length > 10) {
-            activities.pop()
+        // Mantener solo las últimas 10 actividades
+        if (actividades.length > 10) {
+            actividades.pop()
         }
 
-        updateRecentActivity()
+        actualizarActividadReciente()
     }
 
-    // Update recent activity list
-    function updateRecentActivity() {
-        const recentActivityList = document.getElementById("recent-activity")
+    // Actualizar lista de actividad reciente
+    function actualizarActividadReciente() {
+        const listaActividadReciente = document.getElementById("actividad-reciente")
 
-        // Clear list
-        recentActivityList.innerHTML = ""
+        // Limpiar lista
+        listaActividadReciente.innerHTML = ""
 
-        // Check if no activities
-        if (activities.length === 0) {
-            recentActivityList.innerHTML = `
-        <li class="list-group-item text-center text-muted">No hay actividad reciente</li>
-      `
+        // Verificar si no hay actividades
+        if (actividades.length === 0) {
+            listaActividadReciente.innerHTML = `
+            <li class="list-group-item text-center text-muted">No hay actividad reciente</li>
+          `
             return
         }
 
-        // Render activities
-        activities.forEach((activity) => {
+        // Renderizar actividades
+        actividades.forEach((actividad) => {
             const item = document.createElement("li")
             item.className = "list-group-item"
 
             item.innerHTML = `
-        <div class="d-flex justify-content-between">
-          <span>${activity.text}</span>
-          <small class="text-muted">${formatDateTime(activity.timestamp)}</small>
-        </div>
-      `
+            <div class="d-flex justify-content-between">
+              <span>${actividad.texto}</span>
+              <small class="text-muted">${formatearFechaHora(actividad.timestamp)}</small>
+            </div>
+          `
 
-            recentActivityList.appendChild(item)
+            listaActividadReciente.appendChild(item)
         })
     }
 
-    // Show toast notification
-    function showToast(title, message, type = "primary") {
-        const toastTitle = document.getElementById("toast-title")
-        const toastMessage = document.getElementById("toast-message")
-        const toastElement = document.getElementById("liveToast")
+    // Mostrar notificación toast
+    function mostrarNotificacion(titulo, mensaje, tipo = "primary") {
+        const tituloNotificacion = document.getElementById("titulo-notificacion")
+        const mensajeNotificacion = document.getElementById("mensaje-notificacion")
+        const elementoNotificacion = document.getElementById("notificacionToast")
 
-        // Set toast content
-        toastTitle.textContent = title
-        toastMessage.textContent = message
+        // Establecer contenido de la notificación
+        tituloNotificacion.textContent = titulo
+        mensajeNotificacion.textContent = mensaje
 
-        // Set toast type
-        toastElement.className = `toast hide border-${type}`
+        // Establecer tipo de notificación
+        elementoNotificacion.className = `toast hide border-${tipo}`
 
-        // Show toast
-        toast.show()
+        // Mostrar notificación
+        notificacion.show()
     }
 
-    // Helper functions
-    function generateId() {
+    // Funciones auxiliares
+    function generarId() {
         return Math.random().toString(36).substring(2, 10)
     }
 
-    function formatDate(dateString) {
-        const date = new Date(dateString)
-        return date.toLocaleDateString("es-ES")
+    function formatearFecha(fechaString) {
+        const fecha = new Date(fechaString)
+        return fecha.toLocaleDateString("es-ES")
     }
 
-    function formatDateTime(date) {
-        return date.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })
+    function formatearFechaHora(fecha) {
+        return fecha.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })
     }
 
-    function getCurrentDate() {
-        const now = new Date()
-        return now.toISOString().split("T")[0]
+    function obtenerFechaActual() {
+        const ahora = new Date()
+        return ahora.toISOString().split("T")[0]
     }
 
-    function isOverdue(returnDate) {
-        const today = new Date()
-        const returnDateObj = new Date(returnDate)
-        return returnDateObj < today
+    function estaVencido(fechaDevolucion) {
+        const hoy = new Date()
+        const fechaDevolucionObj = new Date(fechaDevolucion)
+        return fechaDevolucionObj < hoy
     }
 
-    function getBookTypeName(type) {
-        switch (type) {
+    function obtenerNombreTipoLibro(tipo) {
+        switch (tipo) {
             case "ficcion":
                 return "Ficción"
             case "no-ficcion":
@@ -1065,12 +1224,12 @@ document.addEventListener("DOMContentLoaded", () => {
             case "referencia":
                 return "Referencia"
             default:
-                return type
+                return tipo
         }
     }
 
-    function formatFieldName(fieldName) {
-        // Capitalize first letter and replace camelCase with spaces
-        return fieldName.charAt(0).toUpperCase() + fieldName.slice(1).replace(/([A-Z])/g, " $1")
+    function formatearNombreCampo(nombreCampo) {
+        // Capitalizar primera letra y reemplazar camelCase con espacios
+        return nombreCampo.charAt(0).toUpperCase() + nombreCampo.slice(1).replace(/([A-Z])/g, " $1")
     }
 })
