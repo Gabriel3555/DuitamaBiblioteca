@@ -1382,4 +1382,129 @@ document.addEventListener("DOMContentLoaded", () => {
         // Capitalizar primera letra y reemplazar camelCase con espacios
         return nombreCampo.charAt(0).toUpperCase() + nombreCampo.slice(1).replace(/([A-Z])/g, " $1")
     }
+
+    function inicializarEdicionLibros() {
+        // Cambio de Tipo de Libro en Edición
+        const editarTipoLibro = document.getElementById("editar-tipo-libro");
+        if (editarTipoLibro) {
+            editarTipoLibro.addEventListener("change", function () {
+                generarCamposDinamicos(this.value, document.getElementById("editar-campos-dinamicos"));
+            });
+        }
+    }
+
+// Función para manejar la eliminación de libros
+    function inicializarEliminacionLibros() {
+        // Botones de eliminación en la tabla
+        const botonesEliminar = document.querySelectorAll(".btn-eliminar-libro");
+        if (botonesEliminar) {
+            botonesEliminar.forEach(boton => {
+                boton.addEventListener("click", function(e) {
+                    if (!confirm("¿Está seguro que desea eliminar este libro? Esta acción no se puede deshacer.")) {
+                        e.preventDefault();
+                    }
+                });
+            });
+        }
+    }
+
+// Inicializar DataTable para la tabla de libros
+    function inicializarTablaLibros() {
+        const tablaLibros = document.getElementById("tabla-libros");
+        if (tablaLibros) {
+            $(tablaLibros).DataTable({
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'excel',
+                        text: '<i class="fas fa-file-excel"></i> Excel',
+                        className: 'btn btn-success btn-sm',
+                        titleAttr: 'Exportar a Excel',
+                        exportOptions: {
+                            columns: ':visible'
+                        }
+                    },
+                    {
+                        extend: 'pdf',
+                        text: '<i class="fas fa-file-pdf"></i> PDF',
+                        className: 'btn btn-danger btn-sm',
+                        titleAttr: 'Exportar a PDF',
+                        exportOptions: {
+                            columns: ':visible'
+                        }
+                    },
+                    {
+                        extend: 'print',
+                        text: '<i class="fas fa-print"></i> Imprimir',
+                        className: 'btn btn-info btn-sm',
+                        titleAttr: 'Imprimir',
+                        exportOptions: {
+                            columns: ':visible'
+                        }
+                    },
+                    {
+                        extend: 'colvis',
+                        text: '<i class="fas fa-columns"></i> Columnas',
+                        className: 'btn btn-secondary btn-sm',
+                        titleAttr: 'Mostrar/Ocultar columnas'
+                    }
+                ],
+                language: {
+                    "sProcessing":     "Procesando...",
+                    "sLengthMenu":     "Mostrar _MENU_ registros",
+                    "sZeroRecords":    "No se encontraron resultados",
+                    "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                    "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                    "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+                    "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+                    "sInfoPostFix":    "",
+                    "sSearch":         "Buscar:",
+                    "sUrl":            "",
+                    "sInfoThousands":  ",",
+                    "sLoadingRecords": "Cargando...",
+                    "oPaginate": {
+                        "sFirst":    "Primero",
+                        "sLast":     "Último",
+                        "sNext":     "Siguiente",
+                        "sPrevious": "Anterior"
+                    },
+                    "oAria": {
+                        "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                    },
+                    "buttons": {
+                        "copy": "Copiar",
+                        "colvis": "Visibilidad",
+                        "collection": "Colección",
+                        "colvisRestore": "Restaurar visibilidad",
+                        "copyKeys": "Presione ctrl o u2318 + C para copiar los datos de la tabla al portapapeles del sistema. <br><br>Para cancelar, haga clic en este mensaje o presione escape.",
+                        "copySuccess": {
+                            "1": "Copiada 1 fila al portapapeles",
+                            "_": "Copiadas %d filas al portapapeles"
+                        },
+                        "copyTitle": "Copiar al portapapeles",
+                        "csv": "CSV",
+                        "excel": "Excel",
+                        "pageLength": {
+                            "-1": "Mostrar todas las filas",
+                            "_": "Mostrar %d filas"
+                        },
+                        "pdf": "PDF",
+                        "print": "Imprimir"
+                    }
+                }
+            });
+        }
+    }
+
+// Inicializar todas las funcionalidades cuando el DOM esté cargado
+    document.addEventListener("DOMContentLoaded", function() {
+        // Inicializar funcionalidades existentes
+
+        // Inicializar nuevas funcionalidades
+        inicializarEdicionLibros();
+        inicializarEliminacionLibros();
+        inicializarTablaLibros();
+    });
 })
+

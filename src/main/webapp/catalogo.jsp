@@ -1,4 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="com.app.duitamabiblioteca.modelo.*" %>
+<%@ page import="java.util.ArrayList" %>
 <%@ include file="header.jsp" %>
 
 <!-- Book List Section -->
@@ -37,7 +39,7 @@
                 <table id="tabla-libros" class="table table-hover">
                     <thead>
                     <tr>
-                        <th>ISBN</th>
+                        <th>ID</th>
                         <th>Título</th>
                         <th>Autor</th>
                         <th>Tipo</th>
@@ -46,9 +48,49 @@
                     </tr>
                     </thead>
                     <tbody id="cuerpo-tabla-libros">
+                    <%
+                        ArrayList<Libro> libros = Biblioteca.getLibros();
+                        if (libros != null && !libros.isEmpty()) {
+                            for (Libro libro : libros) {
+                                String autor = "";
+                                if (libro instanceof LibroFiccion) {
+                                    autor = ((LibroFiccion) libro).getAutor();
+                                }
+                    %>
+                    <tr>
+                        <td><%= libro.getId() %></td>
+                        <td><%= libro.getTitulo() %></td>
+                        <td><%= autor %></td>
+                        <td><%= libro.getTipo() %></td>
+                        <td>
+                            <span class="badge <%= libro.isDisponible() ? "bg-success" : "bg-danger" %>">
+                                <%= libro.isDisponible() ? "Disponible" : "No disponible" %>
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-sm btn-primary btn-ver-libro" data-book-id="<%= libro.getId() %>">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <a href="editar.jsp?id=<%= libro.getId() %>" class="btn btn-sm btn-warning">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a href="eliminar.jsp?id=<%= libro.getId() %>" class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    <%
+                        }
+                    } else {
+                    %>
                     <tr class="text-center text-muted">
                         <td colspan="6">No hay libros registrados</td>
                     </tr>
+                    <%
+                        }
+                    %>
                     </tbody>
                 </table>
             </div>
