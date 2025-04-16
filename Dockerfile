@@ -5,7 +5,7 @@ FROM tomcat:11-jdk17
 WORKDIR /usr/local/tomcat
 
 # Copia tu archivo WAR al directorio webapps de Tomcat
-COPY target/DuitamaBiblioteca-1.0-SNAPSHOT.war /usr/local/tomcat/webapps/
+COPY src/main/webapp/DuitamaBiblioteca-1.0-SNAPSHOT.war /usr/local/tomcat/webapps/
 
 # Expone el puerto 8080 para acceder a la aplicación
 EXPOSE 8080
