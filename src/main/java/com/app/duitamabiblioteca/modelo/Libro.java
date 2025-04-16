@@ -1,27 +1,39 @@
 package com.app.duitamabiblioteca.modelo;
 
 public abstract class Libro {
-    private static int contador = 1;
-    private int id;
     private String titulo;
-    private int anio;
-    private boolean disponible;
+    private String autor;
+    private String isbn;
 
-    public Libro(String titulo, int anio) {
-        this.id = contador++;
+    public Libro(String titulo, String autor, String isbn) {
         this.titulo = titulo;
-        this.anio = anio;
-        this.disponible = true;
+        this.autor = autor;
+        this.isbn = isbn;
     }
 
-    public int getId() { return id; }
-    public String getTitulo() { return titulo; }
-    public void setTitulo(String titulo) { this.titulo = titulo; }
-    public int getAnio() { return anio; }
-    public void setAnio(int anio) { this.anio = anio; }
-    public boolean isDisponible() { return disponible; }
-    public void setDisponible(boolean disponible) { this.disponible = disponible; }
+    public String getTitulo() {
+        return titulo;
+    }
 
-    public abstract String getTipo();
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
+
+    public String getAutor() {
+        return autor;
+    }
+
+    public void setAutor(String autor) {
+        this.autor = autor;
+    }
+
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
+    }
+
     public abstract String getDetalles();
 }

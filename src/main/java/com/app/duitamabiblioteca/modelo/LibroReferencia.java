@@ -2,24 +2,32 @@ package com.app.duitamabiblioteca.modelo;
 
 public class LibroReferencia extends Libro {
     private String campoAcademico;
-    private boolean soloConsulta;
+    private boolean prestable;
 
-    public LibroReferencia(String titulo, int anio, String campoAcademico, boolean soloConsulta) {
-        super(titulo, anio);
+    public LibroReferencia(String titulo, String autor, String isbn, String campoAcademico, boolean prestable) {
+        super(titulo, autor, isbn);
         this.campoAcademico = campoAcademico;
-        this.soloConsulta = soloConsulta;
+        this.prestable = prestable;
     }
 
-    public String getCampoAcademico() { return campoAcademico; }
-    public void setCampoAcademico(String campoAcademico) { this.campoAcademico = campoAcademico; }
-    public boolean isSoloConsulta() { return soloConsulta; }
-    public void setSoloConsulta(boolean soloConsulta) { this.soloConsulta = soloConsulta; }
+    public String getCampoAcademico() {
+        return campoAcademico;
+    }
 
-    @Override
-    public String getTipo() { return "Referencia"; }
+    public void setCampoAcademico(String campoAcademico) {
+        this.campoAcademico = campoAcademico;
+    }
+
+    public boolean isPrestable() {
+        return prestable;
+    }
+
+    public void setPrestable(boolean prestable) {
+        this.prestable = prestable;
+    }
 
     @Override
     public String getDetalles() {
-        return "Campo académico: " + campoAcademico + ", Solo consulta: " + (soloConsulta ? "Sí" : "No");
+        return "Campo académico: " + campoAcademico + ", Prestable: " + (prestable ? "Sí" : "No");
     }
 }
