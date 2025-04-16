@@ -1,60 +1,98 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Biblioteca Municipal</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-</head>
-<body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="index.jsp">Biblioteca Municipal</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav">
-        <!-- Opciones de Libros -->
-        <li class="nav-item">
-          <a class="nav-link" href="listarLibros.jsp">Listar Libros</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="agregarLibro.jsp">Agregar Libro</a>
-        </li>
+<jsp:include page="resources/header.jsp" />
 
-        <!-- Opciones de Préstamos -->
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Gestión de Préstamos
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="container text-center">
+    <div class="row justify-content-center">
+      <div class="col-md-10 animate-fade-in">
+        <h1><i class="fas fa-book-reader"></i> Biblioteca Municipal de Duitama</h1>
+        <p class="lead">Sistema de gestión bibliotecaria para facilitar el control y préstamo de libros.</p>
+        <div class="mt-5">
+          <a href="listarLibros.jsp" class="btn btn-light btn-lg me-3">
+            <i class="fas fa-book"></i> Ver Catálogo
           </a>
-          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <li><a class="dropdown-item" href="listarPrestamos.jsp">Listar Préstamos</a></li>
-            <li><a class="dropdown-item" href="registrarPrestamo.jsp">Registrar Préstamo</a></li>
-          </ul>
-        </li>
-      </ul>
+          <a href="registrarPrestamo.jsp" class="btn btn-outline-light btn-lg">
+            <i class="fas fa-handshake"></i> Registrar Préstamo
+          </a>
+        </div>
+      </div>
     </div>
   </div>
-</nav>
+</section>
 
-<div class="container mt-5">
-  <div class="text-center">
-    <h1 class="display-4">Bienvenido a la Biblioteca Municipal</h1>
-    <p class="lead">Gestiona los libros de la biblioteca de manera sencilla y eficiente.</p>
-    <a href="listarLibros.jsp" class="btn btn-primary btn-lg">Ver Libros</a>
-    <a href="agregarLibro.jsp" class="btn btn-success btn-lg">Agregar Libro</a>
+<!-- Features Section -->
+<section class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-4 mb-4">
+      <div class="card feature-card h-100">
+        <i class="fas fa-book"></i>
+        <h3>Gestión de Libros</h3>
+        <p>Administra fácilmente el catálogo de libros de la biblioteca, incluyendo libros de ficción, no ficción y referencia.</p>
+        <a href="listarLibros.jsp" class="btn btn-primary mt-auto">Explorar Libros</a>
+      </div>
+    </div>
+    <div class="col-md-4 mb-4">
+      <div class="card feature-card h-100">
+        <i class="fas fa-handshake"></i>
+        <h3>Control de Préstamos</h3>
+        <p>Registra y gestiona los préstamos de libros, con fechas de entrega y devolución para un mejor control.</p>
+        <a href="listarPrestamos.jsp" class="btn btn-primary mt-auto">Ver Préstamos</a>
+      </div>
+    </div>
   </div>
-</div>
+</section>
 
-<footer class="bg-primary text-white text-center py-3 mt-5">
-  <p>&copy; 2025 Biblioteca Municipal de Duitama. Todos los derechos reservados.</p>
-</footer>
-
+<!-- Recent Books Section -->
+<section class="container my-5">
+  <div class="row">
+    <div class="col-12 text-center mb-4">
+      <h2><i class="fas fa-star"></i> Acciones Rápidas</h2>
+      <p class="text-muted">Accede rápidamente a las funciones más utilizadas del sistema</p>
+    </div>
+  </div>
+  <div class="row justify-content-center">
+    <div class="col-md-3 mb-4">
+      <div class="card text-center h-100">
+        <div class="card-body">
+          <i class="fas fa-plus-circle fa-3x text-success mb-3"></i>
+          <h5 class="card-title">Agregar Libro</h5>
+          <p class="card-text">Registra un nuevo libro en el sistema</p>
+          <a href="agregarLibro.jsp" class="btn btn-success">Agregar</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-4">
+      <div class="card text-center h-100">
+        <div class="card-body">
+          <i class="fas fa-list fa-3x text-primary mb-3"></i>
+          <h5 class="card-title">Listar Libros</h5>
+          <p class="card-text">Consulta el catálogo completo</p>
+          <a href="listarLibros.jsp" class="btn btn-primary">Consultar</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-4">
+      <div class="card text-center h-100">
+        <div class="card-body">
+          <i class="fas fa-handshake fa-3x text-warning mb-3"></i>
+          <h5 class="card-title">Nuevo Préstamo</h5>
+          <p class="card-text">Registra un nuevo préstamo</p>
+          <a href="registrarPrestamo.jsp" class="btn btn-warning">Registrar</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-4">
+      <div class="card text-center h-100">
+        <div class="card-body">
+          <i class="fas fa-clipboard-list fa-3x text-danger mb-3"></i>
+          <h5 class="card-title">Listar Préstamos</h5>
+          <p class="card-text">Consulta todos los préstamos</p>
+          <a href="listarPrestamos.jsp" class="btn btn-danger">Consultar</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 <jsp:include page="bot.jsp"></jsp:include>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+<jsp:include page="/resources/footer.jsp" />

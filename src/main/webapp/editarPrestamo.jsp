@@ -21,25 +21,36 @@
         mensaje = "Préstamo actualizado exitosamente.";
     }
 %>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar Préstamo</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-</head>
-<body>
-<div class="container mt-5">
-    <h2 class="text-center mb-4">Editar Préstamo</h2>
+
+<jsp:include page="/resources/header.jsp" />
+
+<!-- Page Header -->
+<div class="page-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h2><i class="fas fa-edit"></i> Editar Préstamo</h2>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="index.jsp">Inicio</a></li>
+                        <li class="breadcrumb-item"><a href="listarPrestamos.jsp">Préstamos</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Editar Préstamo</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
     <% if (!mensaje.isEmpty()) { %>
     <script>
         Swal.fire({
             icon: '<%= mensaje.contains("exitosamente") ? "success" : "error" %>',
-            title: '<%= mensaje.contains("exitosamente") ? "¡Éxito!" : "Error" %>',
+            title: '<%= mensaje.contains("exitosamente") ? "¡Préstamo actualizado!" : "Error" %>',
             text: '<%= mensaje %>',
-            confirmButtonText: 'Aceptar'
+            confirmButtonText: '<i class="fas fa-check"></i> Aceptar',
+            confirmButtonColor: '<%= mensaje.contains("exitosamente") ? "#2ecc71" : "#e74c3c" %>'
         }).then(() => {
             <% if (mensaje.contains("exitosamente")) { %>
             window.location.href = "listarPrestamos.jsp";
@@ -47,27 +58,80 @@
         });
     </script>
     <% } %>
+
     <% if (prestamo != null) { %>
-    <form method="post">
-        <div class="mb-3">
-            <label for="isbn" class="form-label">ISBN del Libro</label>
-            <input type="text" class="form-control" id="isbn" name="isbn" value="<%= prestamo.getIsbnLibro() %>" readonly>
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-white">
+                    <h4 class="mb-0"><i class="fas fa-edit"></i> Editar Información del Préstamo</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2"><i class="fas fa-info-circle"></i> Información del Libro</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="isbn" class="form-label">ISBN del Libro</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-barcode"></i></span>
+                                        <input type="text" class="form-control" id="isbn" name="isbn" value="<%= prestamo.getIsbnLibro() %>" readonly>
+                                    </div>
+                                    <div class="form-text">El ISBN no se puede modificar</div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="titulo" class="form-label">Título del Libro</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-book"></i></span>
+                                        <input type="text" class="form-control" id="titulo" name="titulo" value="<%= prestamo.getTituloLibro() %>" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2"><i class="fas fa-calendar-alt"></i> Fechas del Préstamo</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="fechaPrestamo" class="form-label">Fecha de Préstamo</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-calendar-plus"></i></span>
+                                        <input type="date" class="form-control" id="fechaPrestamo" name="fechaPrestamo" value="<%= prestamo.getFechaPrestamo() %>" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="fechaDevolucion" class="form-label">Fecha de Devolución</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-calendar-check"></i></span>
+                                        <input type="date" class="form-control" id="fechaDevolucion" name="fechaDevolucion" value="<%= prestamo.getFechaDevolucion() %>" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-warning btn-lg" name="submit">
+                                <i class="fas fa-save"></i> Guardar Cambios
+                            </button>
+                            <a href="listarPrestamos.jsp" class="btn btn-secondary btn-lg ms-2">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        <div class="mb-3">
-            <label for="titulo" class="form-label">Título del Libro</label>
-            <input type="text" class="form-control" id="titulo" name="titulo" value="<%= prestamo.getTituloLibro() %>" readonly>
+    </div>
+    <% } else { %>
+    <div class="alert alert-danger">
+        <i class="fas fa-exclamation-triangle"></i> <%= mensaje %>
+        <div class="mt-3">
+            <a href="listarPrestamos.jsp" class="btn btn-primary">
+                <i class="fas fa-arrow-left"></i> Volver a la lista de préstamos
+            </a>
         </div>
-        <div class="mb-3">
-            <label for="fechaPrestamo" class="form-label">Fecha de Préstamo</label>
-            <input type="date" class="form-control" id="fechaPrestamo" name="fechaPrestamo" value="<%= prestamo.getFechaPrestamo() %>" required>
-        </div>
-        <div class="mb-3">
-            <label for="fechaDevolucion" class="form-label">Fecha de Devolución</label>
-            <input type="date" class="form-control" id="fechaDevolucion" name="fechaDevolucion" value="<%= prestamo.getFechaDevolucion() %>" required>
-        </div>
-        <button type="submit" class="btn btn-primary" name="submit">Guardar Cambios</button>
-    </form>
+    </div>
     <% } %>
 </div>
-</body>
-</html>
+<jsp:include page="bot.jsp"></jsp:include>
+<jsp:include page="/resources/footer.jsp" />

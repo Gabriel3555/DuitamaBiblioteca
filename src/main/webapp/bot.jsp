@@ -11,17 +11,17 @@
 <div id="webchat" style="width: 500px; height: 500px"></div>
 <script>
     window.botpress.init({
-        botId: "a726fe13-2ba2-44b7-9c1f-6f1b4376a475",
+        botId: "b419c76c-1bf2-400b-9f74-8abab341ff5f",
         configuration: {
-            botName: "Daniela Bibliotecaria",
-            botAvatar: "https://files.bpcontent.cloud/2025/04/16/03/20250416033327-EW92Q078.png",
+            botName: "Maryuri Asistant",
+            botAvatar: "https://files.bpcontent.cloud/2025/04/16/17/20250416171815-XQN5FUVO.jpeg",
             color: "#5eb1ef",
             variant: "soft",
             themeMode: "dark",
             fontFamily: "inter",
             radius: 1
         },
-        clientId: "f2273056-4853-4ba3-ba59-d3c81aa0d4a7",
+        clientId: "285fcaa0-dcca-481b-af3a-fc6b43ba72de",
         selector: "#webchat"
     });
 </script>
