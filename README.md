@@ -40,3 +40,39 @@
 ## Instalación y ejecución local
 
 1. Clona el repositorio:
+git clone https://github.com/Gabriel3555/DuitamaBiblioteca.git
+
+2. Construye el proyecto con Maven:
+./mvnw clean package
+
+3. Despliega el archivo `ROOT.war` generado en el directorio `target/` dentro del directorio `webapps` de tu instalación de Tomcat 11.
+4. (Opcional) Para ejecutar con Docker:
+- Construye la imagen:
+  ```
+  docker build -t duitama-biblioteca .
+  ```
+- Ejecuta el contenedor:
+  ```
+  docker run -p 8080:8080 duitama-biblioteca
+  ```
+5. Accede a la aplicación desde tu navegador en [http://localhost:8080](http://localhost:8080).
+
+---
+
+## Despliegue
+
+El proyecto está preparado para desplegarse en cualquier servidor compatible con Jakarta EE 11, como Tomcat 11. También puede ejecutarse en un contenedor Docker para facilitar la portabilidad y el despliegue en diferentes entornos.
+
+---
+
+## Contribuciones
+
+¡Las contribuciones son bienvenidas! Si deseas mejorar DuitamaBiblioteca, por favor abre un issue o un pull request.
+
+---
+
+## Licencia
+
+Este proyecto se distribuye bajo una licencia de código abierto. Consulta el archivo `LICENSE` para más detalles.
+
+---
